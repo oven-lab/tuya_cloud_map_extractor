@@ -8,12 +8,12 @@
     "dependencies": [],
     "documentation": "https://github.com/oven-lab/tuya_cloud_map_extractor/blob/main/README.md",
     "integration_type": "entity",
+    "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/oven-lab/tuya_cloud_map_extractor/issues",
     "requirements": [
+        "numpy",
         "pillow",
-        "requests",
-        "numpy"
+        "requests"
     ],
-    "version": "v1.0.0",
-    "iot_class": "cloud_polling"
+    "version": "v1.0.0"
 }
