@@ -1,0 +1,22 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Enter your tuya cloud credentials",
+                "data": {
+                    "name": "Entity name",
+                    "client_id": "Client ID",
+                    "client_secret": "Cient Secret",
+                    "device_id": "Device ID"
+                }
+            }
+        },
+        "error": {
+            "client_id": "Invalid Client ID",
+            "client_secret": "Invalid Client Secret",
+            "device_id": "Invalid Device ID. Check device ID AND server region.",
+            "server": "Wrong Server",
+            "unknown": "An unknown error occured. See logs for details."
+        }
+    }
+}

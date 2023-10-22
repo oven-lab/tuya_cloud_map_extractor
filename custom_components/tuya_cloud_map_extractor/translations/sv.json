@@ -1,0 +1,22 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Skriv in dina Tuya Cloud uppgifter",
+                "data": {
+                    "name": "Entitetsnamn",
+                    "client_id": "Client ID",
+                    "client_secret": "Client Secret",
+                    "device_id": "Device ID"
+                }
+            }
+        },
+        "error": {
+            "client_id": "Felaktigt Client ID",
+            "client_secret": "Felaktig Client Secret",
+            "device_id": "Felaktigt Device ID. Kontrollera device IDt OCH server regionen.",
+            "server": "Fel server",
+            "unknown": "Ett okänt fel inträffade. Kontrollera loggarna."
+        }
+    }
+}
