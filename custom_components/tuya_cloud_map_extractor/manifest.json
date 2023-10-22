@@ -1,11 +1,14 @@
 {
     "domain": "tuya_cloud_map_extractor",
     "name": "Tuya Cloud Map Extractor",
-    "config_flow": true,
-    "dependencies": [],
     "codeowners": [
         "@oven-Lab"
     ],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/oven-lab/tuya_cloud_map_extractor/blob/main/README.md",
+    "integration_type": "entity",
+    "issue_tracker": "https://github.com/oven-lab/tuya_cloud_map_extractor/issues",
     "requirements": [
         "pillow",
         "requests",
