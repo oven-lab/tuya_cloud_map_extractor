@@ -1,0 +1,16 @@
+{
+    "domain": "tuya_cloud_map_extractor",
+    "name": "Tuya Cloud Map Extractor",
+    "config_flow": true,
+    "dependencies": [],
+    "codeowners": [
+        "@oven-Lab"
+    ],
+    "requirements": [
+        "pillow",
+        "requests",
+        "numpy"
+    ],
+    "version": "v1.0.0",
+    "iot_class": "cloud_polling"
+}
