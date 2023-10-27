@@ -21,6 +21,7 @@ To install this integration, manually add the contents of custom_components to y
 
 * A laser vacuum added to the Tuya Smart app.
 * A configured Tuya IoT development platform, with a cloud project and linked device. (Need help? See the [Tuya integration](https://www.home-assistant.io/integrations/tuya/#configuration-of-the-tuya-iot-platform).)
+* **LOOK HERE** - Add the tuya sweeping robot open api in the cloud platform. Otherwise the integration will not work.
 
 ### Configuration in Home Assistant
 After the installation of this integration into Home Assistant, the integration is configured via config flow. Add a new integration via the UI and choose "Tuya Vacuum Map Extractor". Then enter your Tuya IoT platform credentials.
