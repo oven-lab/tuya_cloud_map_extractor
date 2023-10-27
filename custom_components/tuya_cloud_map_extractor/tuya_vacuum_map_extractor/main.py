@@ -70,11 +70,11 @@ def download_map(url: str) -> dict:
     """Downloads map and converts it to a dictionary object."""
     try:
         response = requests.get(url=url, timeout=2.5)
-        _LOGGER.debug("Response. " + str(response))
+        _LOGGER.debug("Response. " + str(response.status_code) + str(response.content))
         return response.json()
     except Exception as e:
         _LOGGER.exception(e)
-        _LOGGER.error("Could not parse response. " + str(response))
+        _LOGGER.error("Could not parse response. " + str(response.status_code) + str(response.content))
 
 
 def render_layout(raw_map: dict):
