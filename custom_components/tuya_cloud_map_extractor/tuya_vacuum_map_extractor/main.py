@@ -68,7 +68,13 @@ def get_download_link(
 
 def download_map(url: str) -> dict:
     """Downloads map and converts it to a dictionary object."""
-    return requests.get(url=url, timeout=2.5).json()
+    try:
+        response = requests.get(url=url, timeout=2.5)
+        _LOGGER.debug("Response. " + str(response))
+        return response.json()
+    except Exception as e:
+        _LOGGER.exception(e)
+        _LOGGER.error("Could not parse response. " + str(response))
 
 
 def render_layout(raw_map: dict):
