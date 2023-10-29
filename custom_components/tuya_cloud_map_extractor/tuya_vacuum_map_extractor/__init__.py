@@ -2,6 +2,7 @@
 
 from .main import (
     get_map,
+    debug_file,
     ClientIDError,
     ClientSecretError,
     DeviceIDError,

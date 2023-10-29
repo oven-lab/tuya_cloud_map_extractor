@@ -121,6 +121,22 @@ def _get_sign(client_id: str, secret_key: str, url: str, t: int, token: str):
         secret_key.encode(), msg=signstr.encode(), digestmod="sha256"
     ).hexdigest()
 
+def _get_token(server: str, client_id: str, secret_key: str) -> str:
+    url = "/v1.0/token?grant_type=1"
+    response = tuyarequest(
+        server=server, url=url, client_id=client_id, secret_key=secret_key
+    )
+    _LOGGER.debug(response)
+    if not response["success"]:
+        if response["msg"] == "clientId is invalid":
+            raise ClientIDError("Invalid Client ID")
+        if response["msg"] == "sign invalid":
+            raise ClientSecretError("Invalid Client Secret")
+        if "cross-region access is not allowed" in response["msg"]:
+            raise ServerError("Wrong server region. Cross-region access is not allowed.")
+        raise RuntimeError("Request failed - Response: ", response)
+    return response["result"]["access_token"]
+
 
 def tuyarequest(
     server: str, url: str, client_id: str, secret_key: str, token=""
@@ -147,6 +163,41 @@ def get_map(server: str, client_id: str, secret_key: str, device_id: str) -> Ima
     map_link = get_download_link(server, client_id, secret_key, device_id)
     return render_layout(download_map(map_link))
 
+def debug_file(server: str, client_id: str, secret_key: str, device_id: str) -> bytes:
+    """Gets the latest file from the tuya servers."""
+    token = _get_token(server, client_id, secret_key)
+
+    url = "/v1.0/users/sweepers/file/" + device_id + "/list?fileType=pic&pageNo=1&pageSize=1"
+    response = tuyarequest(
+        server=server,
+        url=url,
+        client_id=client_id,
+        secret_key=secret_key,
+        token=token,
+    )
+
+    _LOGGER.debug(response)
+
+    if not response["success"]:
+        if response["msg"] == "permission deny":
+            raise DeviceIDError("Invalid Device ID")
+        raise RuntimeError("Request failed - Response: ", response)
+    
+    ids = response["result"]["datas"][0]["id"]
+
+    url = "/v1.0/users/sweepers/file/" + device_id + "/download?id=" + str(ids)
+    response = tuyarequest(
+        server=server,
+        url=url,
+        client_id=client_id,
+        secret_key=secret_key,
+        token=token,
+    )
+    _LOGGER.debug(response)
+    url = response["result"]["app_map"]
+
+    response = requests.get(url, timeout=2.5)
+    return response.content
 
 if __name__ == "__main__":
     print("Running as main.py")

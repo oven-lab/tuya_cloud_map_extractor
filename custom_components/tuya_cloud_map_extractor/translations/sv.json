@@ -16,7 +16,8 @@
             "client_secret": "Felaktig Client Secret",
             "device_id": "Felaktigt Device ID. Kontrollera device IDt OCH server regionen.",
             "server": "Fel server",
-            "unknown": "Ett okänt fel inträffade. Kontrollera loggarna."
+            "unknown": "Ett okänt fel inträffade. Kontrollera loggarna.",
+            "json": "Stötte på ett problem när jag skulle avkoda datan från din robot. Skapa ett problem på github och inkludera datan från dina loggar."
         }
     }
 }

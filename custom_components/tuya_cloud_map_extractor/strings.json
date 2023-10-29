@@ -16,7 +16,8 @@
             "client_secret": "Invalid Client Secret",
             "device_id": "Invalid Device ID. Check device ID AND server region.",
             "server": "Wrong Server",
-            "unknown": "An unknown error occured. See logs for details."
+            "unknown": "An unknown error occured. See logs for details.",
+            "json": "Encountered an error while decoding the data from your vacuum. Create an issue on github and include the data from your logs."
         }
     }
 }
