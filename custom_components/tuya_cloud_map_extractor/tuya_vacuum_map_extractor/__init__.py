@@ -2,7 +2,10 @@
 
 from .main import (
     get_map,
-    debug_file,
+    debug_file
+)
+
+from .const import (
     ClientIDError,
     ClientSecretError,
     DeviceIDError,

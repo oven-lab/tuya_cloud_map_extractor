@@ -100,12 +100,3 @@ async def validate(hass: HomeAssistant, data: dict):
         data["client_secret"],
         data["device_id"],
     )
-
-async def get_file(hass: HomeAssistant, data: dict):
-    return await hass.async_add_executor_job(
-        debug_file,
-        data["server"],
-        data["client_id"],
-        data["client_secret"],
-        data["device_id"]
-    )
