@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from typing import Any
-from requests.exceptions import JSONDecodeError
 from .tuya_vacuum_map_extractor import (
     get_map,
     debug_file,
@@ -69,9 +68,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors[CONF_DEVICE_ID] = "device_id"
             except ServerError:
                 errors[CONF_SERVER] = "server"
-            except JSONDecodeError:
-                _LOGGER.error(await get_file(self.hass, user_input))
-                errors["base"] = "json"
             except Exception as error:
                 _LOGGER.exception(error)
                 errors["base"] = "unknown"
