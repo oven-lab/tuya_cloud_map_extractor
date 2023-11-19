@@ -4,7 +4,6 @@ import logging
 from typing import Any
 from .tuya_vacuum_map_extractor import (
     get_map,
-    debug_file,
     ClientIDError,
     ClientSecretError,
     DeviceIDError,
