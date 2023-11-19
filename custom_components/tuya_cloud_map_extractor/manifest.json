@@ -15,5 +15,5 @@
         "pillow",
         "requests"
     ],
-    "version": "v1.1.0b2"
+    "version": "v1.1.0"
 }
