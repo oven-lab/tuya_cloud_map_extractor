@@ -1,3 +1,4 @@
+from datetime import timedelta
 import io
 import logging
 from enum import Enum
@@ -22,8 +23,12 @@ from homeassistant.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+SCAN_INTERVAL = timedelta(minutes=1)
 
-async def async_setup_entry(hass: HomeAssistant, config, async_add_entities, discovery_info=None):
+
+async def async_setup_entry(
+    hass: HomeAssistant, config, async_add_entities, discovery_info=None
+):
     _LOGGER.debug("Async setup entry")
     name = config.title
     should_poll = False
@@ -66,6 +71,7 @@ class VacuumCamera(Camera):
         self._access_token = ""
         self._should_poll = should_poll
         self._image = None
+        self._extra_state_attr = None
         self._map_data = None
         self._client_id = client_id
         self._secret_key = secret_key
@@ -100,10 +106,14 @@ class VacuumCamera(Camera):
         else:
             return "off"
 
+    @property
+    def extra_state_attributes(self) -> dict:
+        return self._extra_state_attr
+
     def update(self):
         try:
             _LOGGER.debug("Getting map")
-            map_data = get_map(
+            headers, map_data = get_map(
                 self._server, self._client_id, self._secret_key, self._device_id
             )
             _LOGGER.debug("Map data retrieved")
@@ -116,6 +126,7 @@ class VacuumCamera(Camera):
         if map_data is not None:
             _LOGGER.debug("Map is ok")
             self._set_map_data(map_data)
+            self._set_extra_attr(headers)
             self._status = CameraStatus.OK
 
     def _set_map_data(self, map_data):
@@ -123,6 +134,32 @@ class VacuumCamera(Camera):
         map_data.save(img_byte_arr, format="PNG")
         self._image = img_byte_arr.getvalue()
         self._map_data = map_data
+
+    def _set_extra_attr(self, headers):
+        self._extra_state_attr = {}
+        self._extra_state_attr["ID"] = headers["id"]
+        self._extra_state_attr["width"] = headers["width"]
+        self._extra_state_attr["height"] = headers["height"]
+        self._extra_state_attr["resolution"] = headers["mapResolution"]
+        if "pileX" in headers:
+            self._extra_state_attr["pileX"] = headers["pileX"]
+            self._extra_state_attr["pileY"] = headers["pileY"]
+        if "originX" in headers:
+            self._extra_state_attr["originX"] = headers["originX"]
+            self._extra_state_attr["originY"] = headers["originY"]
+        if "x_min" in headers:
+            self._extra_state_attr["x_min"] = headers["x_min"]
+            self._extra_state_attr["y_min"] = headers["y_min"]
+        if "roominfo" in headers:
+            rooms = []
+            for i in headers["roominfo"]:
+                room = i
+                room.pop("color_order", None)
+                if not "vertexNum" in room or room["vertexNum"] == 0:
+                    room.pop("vertexNum", None)
+                    room.pop("vertexStr", None)
+                rooms.append(room)
+            self._extra_state_attr["rooms"] = rooms
 
     def camera_image(
         self, width: Optional[int] = None, height: Optional[int] = None
@@ -134,6 +171,7 @@ class VacuumCamera(Camera):
 
     def turn_off(self):
         self._should_poll = False
+        self.async_schedule_update_ha_state()
 
 
 class CameraStatus(Enum):

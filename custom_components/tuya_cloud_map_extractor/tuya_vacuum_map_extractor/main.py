@@ -35,7 +35,7 @@ def download_map(url: dict) -> dict:
             'height': height,
             'x_min': data["data"]["x_min"],
             'y_min': data["data"]["y_min"],
-            'mapresolution': data["data"]["resolution"]
+            'mapResolution': data["data"]["resolution"]
         }
         return header, bytes_map
     except JSONDecodeError:
@@ -84,7 +84,7 @@ def render_layout(headers: dict, raw_map):
         array = to_array_v1(pixellist, width, height)
 
     image = Image.fromarray(array)
-    return image
+    return headers, image
 
 def get_map(server: str, client_id: str, secret_key: str, device_id: str) -> Image:
     """Downloads and parses vacuum map from tuya cloud."""

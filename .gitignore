@@ -162,3 +162,4 @@ cython_debug/
 # custom
 *.png
 debug_server/
+test.py

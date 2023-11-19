@@ -55,7 +55,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             try:
-                info = await validate(self.hass, user_input)
+                headers, image = await validate(self.hass, user_input)
                 return self.async_create_entry(
                     title=user_input.pop(CONF_NAME), data=user_input
                 )
@@ -92,7 +92,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 async def validate(hass: HomeAssistant, data: dict):
     """Validate the user input"""
-    await hass.async_add_executor_job(
+    return await hass.async_add_executor_job(
         get_map,
         data["server"],
         data["client_id"],
