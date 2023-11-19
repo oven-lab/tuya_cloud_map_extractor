@@ -18,10 +18,10 @@ _LOGGER = logging.getLogger(__name__)
 def download_map(url: dict) -> dict:
     """Downloads map and converts it to a dictionary and bytes object."""
 
-    url = url["result"][0]["map_url"]
+    mapurl = url["result"][0]["map_url"]
 
-    response = requests.get(url=url, timeout=2.5)
-    _LOGGER.debug("Response: " + str(response.status_code), str(base64.b64encode(response.content)), str(base64.b64encode(bytes(str(url), 'utf-8'))))
+    response = requests.get(url=mapurl, timeout=2.5)
+    _LOGGER.debug("Response: " + str(response.status_code) + str(base64.b64encode(response.content)) + str(base64.b64encode(bytes(str(url), 'utf-8'))))
     try:
         data = response.json()
         binary_data = base64.b64decode(data["data"]["map"])
@@ -52,7 +52,7 @@ def download_map(url: dict) -> dict:
 
         return header, mapDataArr
     except Exception as error:
-        _LOGGER.error('Unsupported data type. Include the following data in a github issue to request the data format to be added: ', str(response.status_code), str(base64.b64encode(response.content)), str(base64.b64encode(bytes(str(url), 'utf-8'))), ' Thank you!')
+        _LOGGER.error('Unsupported data type. Include the following data in a github issue to request the data format to be added: ' + str(response.status_code) + str(base64.b64encode(response.content)) + str(base64.b64encode(bytes(str(url), 'utf-8'))) + ' Thank you!')
 
 def to_array_custom0(pixellist: list, width: int, height: int) -> np.array:
     pixels = []
