@@ -7,7 +7,41 @@
                     "name": "Entitetsnamn",
                     "client_id": "Client ID",
                     "client_secret": "Client Secret",
-                    "device_id": "Device ID"
+                    "device_id": "Device ID",
+                    "color_conf": "Ställ in färger"
+                }
+            },
+            "colorconf": {
+                "description": "Skriv in färger för kartan som röd, grön, blå. ex: 255, 255, 255",
+                "data": {
+                    "bg_color": "Bakgrundsfärg",
+                    "wall_color": "Väggfärg",
+                    "room_colors": "Ställ in rumsfärger"
+                }
+            },
+            "room_colors": {
+                "description": "Lägg till rumsfärger",
+                "data": {
+                    "room_name_1": "Namn",
+                    "room_color_1": "Färg",
+                    "room_name_2": "Namn",
+                    "room_color_2": "Färg",
+                    "room_name_3": "Namn",
+                    "room_color_3": "Färg",
+                    "room_name_4": "Namn",
+                    "room_color_4": "Färg",
+                    "room_name_5": "Namn",
+                    "room_color_5": "Färg",
+                    "room_name_6": "Namn",
+                    "room_color_6": "Färg",
+                    "room_name_7": "Namn",
+                    "room_color_7": "Färg",
+                    "room_name_8": "Namn",
+                    "room_color_8": "Färg",
+                    "room_name_9": "Namn",
+                    "room_color_9": "Färg",
+                    "room_name_10": "Namn",
+                    "room_color_10": "Färg"
                 }
             }
         },
@@ -17,7 +51,9 @@
             "device_id": "Felaktigt Device ID. Kontrollera device IDt OCH server regionen.",
             "server": "Fel server",
             "unknown": "Ett okänt fel inträffade. Kontrollera loggarna.",
-            "json": "Stötte på ett problem när jag skulle avkoda datan från din robot. Skapa ett problem på github och inkludera datan från dina loggar."
+            "json": "Stötte på ett problem när jag skulle avkoda datan från din robot. Skapa ett problem på github och inkludera datan från dina loggar.",
+            "no_color_specified": "Ingen färg angiven",
+            "good": "OK"
         }
     }
 }

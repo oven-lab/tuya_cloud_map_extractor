@@ -7,7 +7,41 @@
                     "name": "Entity name",
                     "client_id": "Client ID",
                     "client_secret": "Cient Secret",
-                    "device_id": "Device ID"
+                    "device_id": "Device ID",
+                    "color_conf": "Configure colors"
+                }
+            },
+            "colorconf": {
+                "description": "Enter colors for map in format red, green, blue",
+                "data": {
+                    "bg_color": "Background color",
+                    "wall_color": "Wall color",
+                    "room_colors": "Configure room colors"
+                }
+            },
+            "room_colors": {
+                "description": "Enter room colors.",
+                "data": {
+                    "room_name_1": "Name",
+                    "room_color_1": "Color",
+                    "room_name_2": "Name",
+                    "room_color_2": "Color",
+                    "room_name_3": "Name",
+                    "room_color_3": "Color",
+                    "room_name_4": "Name",
+                    "room_color_4": "Color",
+                    "room_name_5": "Name",
+                    "room_color_5": "Color",
+                    "room_name_6": "Name",
+                    "room_color_6": "Color",
+                    "room_name_7": "Name",
+                    "room_color_7": "Color",
+                    "room_name_8": "Name",
+                    "room_color_8": "Color",
+                    "room_name_9": "Name",
+                    "room_color_9": "Color",
+                    "room_name_10": "Name",
+                    "room_color_10": "Color"
                 }
             }
         },
@@ -17,7 +51,9 @@
             "device_id": "Invalid Device ID. Check device ID AND server region.",
             "server": "Wrong Server",
             "unknown": "An unknown error occured. See logs for details.",
-            "json": "Encountered an error while decoding the data from your vacuum. Create an issue on github and include the data from your logs."
+            "json": "Encountered an error while decoding the data from your vacuum. Create an issue on github and include the data from your logs.",
+            "no_color_specified": "No color is specified",
+            "good": "OK"
         }
     }
 }

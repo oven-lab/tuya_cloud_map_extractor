@@ -163,3 +163,4 @@ cython_debug/
 *.png
 debug_server/
 test.py
+*.bin
