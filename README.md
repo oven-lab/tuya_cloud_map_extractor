@@ -28,10 +28,11 @@ To install this integration, manually add the contents of custom_components to y
 After the installation of this integration into Home Assistant, the integration is configured via config flow. Add a new integration via the UI and choose "Tuya Vacuum Map Extractor". Then enter your Tuya IoT platform credentials.
 
 ## Supported devices
-Following is a list of currently supported devices: 
+Following is a list of currently supported devices (confirmed tested by individual users): 
 
-* Elvita CRD4550S [Product Website - SW](https://elvita.se/produkter/rengoring/robotdammsugare/elvita-robotdammsugare-crd4550s)
+* Elvita CRD4550S [Product Website - SE](https://elvita.se/produkter/rengoring/robotdammsugare/elvita-robotdammsugare-crd4550s)
 * Lubluelu SL60D [Product Website - EN](https://lubluelu.com/products/sl60d-poweful-breakpoint-mode-wifi-connected)
+* Zedar R-600 [Product Website - DE](https://zedar.eu)
 
 Feel free to test on your own devices, and add them here. For help, please create an issue!
 
