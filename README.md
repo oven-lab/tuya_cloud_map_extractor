@@ -33,6 +33,7 @@ Following is a list of currently supported devices (confirmed tested by individu
 * Elvita CRD4550S [Product Website - SE](https://elvita.se/produkter/rengoring/robotdammsugare/elvita-robotdammsugare-crd4550s)
 * Lubluelu SL60D [Product Website - EN](https://lubluelu.com/products/sl60d-poweful-breakpoint-mode-wifi-connected)
 * Zedar R-600 [Product Website - DE](https://zedar.eu)
+* Liectroux xr-500 [Product Website - EN](https://liectrouxrobotics.com/products/liectroux-xr500-high-end-robot-vacuum-laser-navigation-6500pa-suction-power-save-5-maps-in-the-app-y-shape-wet-mopping-virtual-wall-setting-have-stock-in-eu-warehouse)
 
 Feel free to test on your own devices, and add them here. For help, please create an issue!
 
