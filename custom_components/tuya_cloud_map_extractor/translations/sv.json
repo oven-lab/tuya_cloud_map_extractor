@@ -16,6 +16,7 @@
                 "data": {
                     "bg_color": "Bakgrundsfärg",
                     "wall_color": "Väggfärg",
+                    "inside_color": "Inomhusfärg",
                     "room_colors": "Ställ in rumsfärger"
                 }
             },

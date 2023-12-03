@@ -14,7 +14,12 @@ CONF_SERVER_INDIA = "https://openapi.tuyain.com"
 
 CONF_COLORS = "color_conf"
 CONF_BG_COLOR = "bg_color"
+CONF_INSIDE_COLOR = "inside_color"
 CONF_WALL_COLOR = "wall_color"
 CONF_ROOM_COLORS = "room_colors"
 CONF_ROOM_COLOR = "room_color_"
 CONF_ROOM_NAME = "room_name_"
+
+DEFAULT_BG_COLOR = [44, 50, 64]
+DEFAULT_WALL_COLOR = [255, 255, 255]
+DEFAULT_ROOM_COLOR = [94, 93, 109]

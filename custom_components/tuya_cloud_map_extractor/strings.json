@@ -16,6 +16,7 @@
                 "data": {
                     "bg_color": "Background color",
                     "wall_color": "Wall color",
+                    "inside_color": "Inside color",
                     "room_colors": "Configure room colors"
                 }
             },

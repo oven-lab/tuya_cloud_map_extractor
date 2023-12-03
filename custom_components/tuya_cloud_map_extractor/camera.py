@@ -37,11 +37,19 @@ async def async_setup_entry(
     client_id = config.data["client_id"]
     secret_key = config.data["client_secret"]
     device_id = config.data["device_id"]
+    colors = config.data["colors"]
     _LOGGER.debug("Adding entities")
     async_add_entities(
         [
             VacuumCamera(
-                entity_id, name, server, client_id, secret_key, device_id, should_poll
+                entity_id,
+                name,
+                server,
+                client_id,
+                secret_key,
+                device_id,
+                should_poll,
+                colors,
             )
         ]
     )
@@ -58,6 +66,7 @@ class VacuumCamera(Camera):
         secret_key: str,
         device_id: str,
         should_poll: bool,
+        colors={},
     ) -> None:
         """Initialized camera."""
         _LOGGER.debug("Init camera")
@@ -77,6 +86,7 @@ class VacuumCamera(Camera):
         self._secret_key = secret_key
         self._device_id = device_id
         self._attr_unique_id = client_id + device_id
+        self._colors = colors
 
     async def async_added_to_hass(self) -> None:
         self.async_schedule_update_ha_state(True)
@@ -114,14 +124,17 @@ class VacuumCamera(Camera):
         try:
             _LOGGER.debug("Getting map")
             headers, map_data = get_map(
-                self._server, self._client_id, self._secret_key, self._device_id
+                self._server,
+                self._client_id,
+                self._secret_key,
+                self._device_id,
+                self._colors,
             )
             _LOGGER.debug("Map data retrieved")
         except Exception as error:
             _LOGGER.warning("Unable to parse map data")
             _LOGGER.error(error)
             self._status = CameraStatus.FAILURE
-            return
 
         if map_data is not None:
             _LOGGER.debug("Map is ok")
@@ -141,6 +154,7 @@ class VacuumCamera(Camera):
         self._extra_state_attr["width"] = headers["width"]
         self._extra_state_attr["height"] = headers["height"]
         self._extra_state_attr["resolution"] = headers["mapResolution"]
+        self._extra_state_attr["colors"] = self._colors
         if "pileX" in headers:
             self._extra_state_attr["pileX"] = headers["pileX"]
             self._extra_state_attr["pileY"] = headers["pileY"]
