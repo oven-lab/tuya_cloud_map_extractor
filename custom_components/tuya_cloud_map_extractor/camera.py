@@ -15,11 +15,11 @@ from homeassistant.components.camera import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
 
-from .const import CONF_PATH
+from .const import CONF_PATH, CONF_LAST
 
 _LOGGER = logging.getLogger(__name__)
 
-SCAN_INTERVAL = timedelta(minutes=1)
+SCAN_INTERVAL = timedelta(seconds=10)
 
 
 async def async_setup_entry(
@@ -34,7 +34,7 @@ async def async_setup_entry(
     secret_key = config.data["client_secret"]
     device_id = config.data["device_id"]
     colors = config.data["colors"]
-    render_path = config.data[CONF_PATH]
+    path_settings = {CONF_PATH: config.data[CONF_PATH], "last": config.data[CONF_LAST]}
     _LOGGER.debug("Adding entities")
     async_add_entities(
         [
@@ -46,7 +46,7 @@ async def async_setup_entry(
                 secret_key,
                 device_id,
                 should_poll,
-                render_path,
+                path_settings,
                 colors,
             )
         ]
@@ -64,7 +64,7 @@ class VacuumCamera(Camera):
         secret_key: str,
         device_id: str,
         should_poll: bool,
-        render_path: bool,
+        path_settings: dict,
         colors: dict,
     ) -> None:
         """Initialized camera."""
@@ -86,7 +86,7 @@ class VacuumCamera(Camera):
         self._device_id = device_id
         self._attr_unique_id = client_id + device_id
         self._colors = colors
-        self._render_path = render_path
+        self._path_settings = path_settings
 
     async def async_added_to_hass(self) -> None:
         self.async_schedule_update_ha_state(True)
@@ -97,6 +97,7 @@ class VacuumCamera(Camera):
 
     @property
     def should_poll(self) -> bool:
+        print("should_poll: ", self._should_poll)
         return self._should_poll
 
     @property
@@ -129,7 +130,7 @@ class VacuumCamera(Camera):
                 self._secret_key,
                 self._device_id,
                 self._colors,
-                self._render_path,
+                self._path_settings,
             )
             _LOGGER.debug("Map data retrieved")
         except Exception as error:

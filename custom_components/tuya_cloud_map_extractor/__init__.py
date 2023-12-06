@@ -8,7 +8,7 @@ from homeassistant.const import Platform
 
 PLATFORMS = [Platform.CAMERA]
 
-from .const import DOMAIN, CONF_PATH
+from .const import DOMAIN, CONF_PATH, CONF_LAST
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -46,16 +46,14 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
 async def update_listener(hass: HomeAssistant, config_entry: ConfigEntry):
     """Handle options update."""
 
+    if not await async_unload_entry(hass, config_entry):
+        return
+
     data = {**config_entry.data}
     options = {**config_entry.options}
 
-    data["path_enabled"] = options["path_enabled"]
+    data[CONF_PATH] = options[CONF_PATH]
+    data[CONF_LAST] = options[CONF_LAST]
 
     hass.config_entries.async_update_entry(config_entry, data=data)
-    await async_reload_entry
-
-async def async_reload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
-    """Reload the config entry."""
-    if not await async_unload_entry(hass, config_entry):
-        return
     await async_setup_entry(hass, config_entry)

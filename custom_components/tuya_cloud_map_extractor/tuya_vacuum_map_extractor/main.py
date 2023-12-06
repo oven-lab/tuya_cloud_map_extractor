@@ -73,9 +73,12 @@ def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
 
 
 def get_map(
-    server: str, client_id: str, secret_key: str, device_id: str, colors={}, render_path=False
+    server: str, client_id: str, secret_key: str, device_id: str, colors={}, path_settings={}
 ) -> Image:
     """Downloads and parses vacuum map from tuya cloud."""
+
+    render_path = path_settings["path_enabled"]
+    last = path_settings["last"]
 
     link = get_download_link(server, client_id, secret_key, device_id)
     map_link = link["result"][0]["map_url"]
@@ -113,7 +116,7 @@ def get_map(
     if render_path:
         _LOGGER.debug("Rendering path")
 
-        if colors == {}:
+        if "path_color" not in colors:
             colors["path_color"] = [0, 255, 0]
         
         scale = int(1080/image.size[0])
@@ -124,6 +127,14 @@ def get_map(
         path = parse_path(response, scale=scale)
         draw = ImageDraw.Draw(image)
         draw.line(path, fill=tuple(colors["path_color"]), width=1)
+
+        if last:
+            x, y = path[-2], path[-1]
+        else:
+            x, y = path[0], path[1]
+
+        draw.ellipse([(x-5, y-5), (x+5, y+5)], outline=(255, 255, 255), fill=(0, 0, 255), width=1)
+
         return header, image
     
     return header, image

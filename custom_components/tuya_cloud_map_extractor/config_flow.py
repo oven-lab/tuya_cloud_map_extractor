@@ -40,6 +40,7 @@ from .const import (
     CONF_ROOM_NAME,
     CONF_PATH,
     CONF_PATH_COLOR,
+    CONF_LAST,
     DEFAULT_BG_COLOR,
     DEFAULT_ROOM_COLOR,
     DEFAULT_WALL_COLOR,
@@ -59,7 +60,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-
     VERSION = 2
 
     def __init__(self) -> None:
@@ -157,9 +157,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_WALL_COLOR: selector(
                 {"color_rgb": {}}  # TODO: default value of [255, 255, 255]
             ),
-            CONF_PATH_COLOR: selector(
-                {"color_rgb": {}}
-            ),
+            CONF_PATH_COLOR: selector({"color_rgb": {}}),
         }
 
         if "roominfo" in self.map_header:
@@ -194,7 +192,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="room_colors", data_schema=vol.Schema(DATA_SCHEMA), errors=errors
         )
-    
+
     @staticmethod
     @callback
     def async_get_options_flow(
@@ -202,7 +200,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> config_entries.OptionsFlow:
         """Create the options flow."""
         return OptionsFlowHandler(config_entry)
-    
+
+
 class OptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
@@ -213,15 +212,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         data = {**self.config_entry.data}
         path_default = data[CONF_PATH]
+        last_default = data[CONF_LAST]
 
         DATA_SCHEMA = {
             vol.Required(CONF_PATH, default=path_default): bool,
+            vol.Required(CONF_LAST, default=last_default): bool,
         }
 
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="init", data_schema=vol.Schema(DATA_SCHEMA))
+
 
 async def validate(hass: HomeAssistant, data: dict):
     """Validate the user input"""
@@ -231,6 +233,8 @@ async def validate(hass: HomeAssistant, data: dict):
         data["client_id"],
         data["client_secret"],
         data["device_id"],
+        {},
+        {CONF_PATH: data["path_enabled"], "last": True},
     )
 
 
@@ -263,6 +267,8 @@ def create_entry_data(data: dict, header: dict):
         data[CONF_WALL_COLOR] = DEFAULT_WALL_COLOR
     if not CONF_PATH_COLOR in data:
         data[CONF_PATH_COLOR] = DEFAULT_PATH_COLOR
+
+    data[CONF_LAST] = True
 
     colors[CONF_BG_COLOR] = data.pop(CONF_BG_COLOR)
     colors[CONF_WALL_COLOR] = data.pop(CONF_WALL_COLOR)

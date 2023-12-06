@@ -22,6 +22,7 @@ CONF_ROOM_NAME = "room_name_"
 
 CONF_PATH = "path_enabled"
 CONF_PATH_COLOR = "path_color"
+CONF_LAST = "last"
 
 DEFAULT_BG_COLOR = [44, 50, 64]
 DEFAULT_WALL_COLOR = [255, 255, 255]
