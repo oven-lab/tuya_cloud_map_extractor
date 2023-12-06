@@ -8,6 +8,7 @@
                     "client_id": "Client ID",
                     "client_secret": "Cient Secret",
                     "device_id": "Device ID",
+                    "path_enabled": "Show path",
                     "color_conf": "Configure colors"
                 }
             },
@@ -17,6 +18,7 @@
                     "bg_color": "Background color",
                     "wall_color": "Wall color",
                     "inside_color": "Inside color",
+                    "path_color": "Path color",
                     "room_colors": "Configure room colors"
                 }
             },
@@ -55,6 +57,15 @@
             "json": "Encountered an error while decoding the data from your vacuum. Create an issue on github and include the data from your logs.",
             "no_color_specified": "No color is specified",
             "good": "OK"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "path_enabled": "Show path"
+                }
+            }
         }
     }
 }

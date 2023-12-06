@@ -8,6 +8,7 @@
                     "client_id": "Client ID",
                     "client_secret": "Client Secret",
                     "device_id": "Device ID",
+                    "path_enabled": "Visa rutt",
                     "color_conf": "Ställ in färger"
                 }
             },
@@ -17,6 +18,7 @@
                     "bg_color": "Bakgrundsfärg",
                     "wall_color": "Väggfärg",
                     "inside_color": "Inomhusfärg",
+                    "path_color": "Ruttens färg",
                     "room_colors": "Ställ in rumsfärger"
                 }
             },
@@ -55,6 +57,15 @@
             "json": "Stötte på ett problem när jag skulle avkoda datan från din robot. Skapa ett problem på github och inkludera datan från dina loggar.",
             "no_color_specified": "Ingen färg angiven",
             "good": "OK"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "path_enabled": "Visa rutt"
+                }
+            }
         }
     }
 }

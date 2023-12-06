@@ -20,6 +20,10 @@ CONF_ROOM_COLORS = "room_colors"
 CONF_ROOM_COLOR = "room_color_"
 CONF_ROOM_NAME = "room_name_"
 
+CONF_PATH = "path_enabled"
+CONF_PATH_COLOR = "path_color"
+
 DEFAULT_BG_COLOR = [44, 50, 64]
 DEFAULT_WALL_COLOR = [255, 255, 255]
 DEFAULT_ROOM_COLOR = [94, 93, 109]
+DEFAULT_PATH_COLOR = [0, 255, 0]

@@ -6,128 +6,147 @@ from requests.exceptions import JSONDecodeError
 
 # import lz4.block
 import logging
-from PIL import Image
-from .pylz4 import uncompress
-from .v1 import _hexStringToNumber, decode_header_v1, to_array_v1, decode_roomArr
+from PIL import Image, ImageDraw
+from .v1 import decode_v1, to_array_v1, decode_path_v1
+from .custom0 import decode_custom0, to_array_custom0
 from .tuya import get_download_link
-from .const import types, default_colors
-import numpy as np
 
 _LOGGER = logging.getLogger(__name__)
 
-def download_map(url: dict) -> dict:
+def download(url: str) -> requests.models.Response:
     """Downloads map and converts it to a dictionary and bytes object."""
 
-    mapurl = url["result"][0]["map_url"]
+    response = requests.get(url=url, timeout=2.5)
+    return response
 
-    response = requests.get(url=mapurl, timeout=2.5)
-    _LOGGER.debug(
-        "Response: "
-        + str(response.status_code)
-        + str(base64.b64encode(response.content))
-        + str(base64.b64encode(bytes(str(url), "utf-8")))
-    )
+def parse_map(response: requests.models.Response):
     try:
         data = response.json()
-        binary_data = base64.b64decode(data["data"]["map"])
-        width = data["data"]["width"]
-        height = data["data"]["height"]
-        bytes_map = uncompress(binary_data)
-        header = {
-            "id": data["data"]["mapId"],
-            "version": "custom0",
-            "width": width,
-            "height": height,
-            "x_min": data["data"]["x_min"],
-            "y_min": data["data"]["y_min"],
-            "mapResolution": data["data"]["resolution"],
-        }
-        return header, bytes_map
+        header, mapDataArr = decode_custom0(data)
+
     except JSONDecodeError:
         data = response.content.hex()
-        header = decode_header_v1(data[0:48])
-        _LOGGER.debug(header)
-        mapArea = header["width"] * header["height"]
-        infoLength = 48 + header["totalcount"] * 2
-        encodeDataArray = bytes(_hexStringToNumber(data[48:infoLength]))
-        raw = uncompress(encodeDataArray)
-        mapDataArr = raw[0:mapArea]
-        mapRoomArr = raw[mapArea:]
-        header["roominfo"] = decode_roomArr(mapRoomArr)
+        header, mapDataArr = decode_v1(data)
 
-        return header, mapDataArr
-    except Exception as error:
-        _LOGGER.error(
-            "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
-            + str(response.status_code)
-            + str(base64.b64encode(response.content))
-            + str(base64.b64encode(bytes(str(url), "utf-8")))
-            + " Thank you!"
-        )
+    return header, mapDataArr
 
+def parse_path(response: requests.models.Response, scale=2.0):
+    try:
+        data = response.json()
+        path_data = [[]]
+    except JSONDecodeError:
+        data = response.content.hex()
+        path_data = decode_path_v1(data)
+    
+    coords = []
+    for coord in path_data:
+        for i in coord:
+            coords.append(i*scale)
 
-def to_array_custom0(
-    pixellist: list, width: int, height: int, colors: dict
-) -> np.array:
-    if colors == {}:
-        colors["bg_color"] = default_colors.custom_0.get("bg_color")
-        colors["wall_color"] = default_colors.custom_0.get("wall_color")
-        colors["inside_color"] = default_colors.custom_0.get("inside_color")
-    pixels = []
-    height_counter = 0
-    while height_counter < height:
-        width_counter = 0
-        line = []
-        while width_counter < width:
-            pixeltype = types.custom0.get(
-                pixellist[width_counter + height_counter * width]
-            )
-            pixel = colors[pixeltype]
-            line.append(pixel)
-            width_counter = width_counter + 1
-        pixels.append(line)
-        height_counter = height_counter + 1
-    return np.array(pixels, dtype=np.uint8)
+    return coords
 
 
-def render_layout(headers: dict, raw_map, colors):
+
+def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
     """Renders the layout map."""
 
-    height = headers["height"]
-    width = headers["width"]
+    width = header["width"]
+    height = header["height"]
+
+    if isinstance(header["version"], list):
+        protoVer = str(header["version"][0])
+    else:
+        protoVer = header["version"]
 
     pixellist = []
     for i in raw_map:
         pixellist.append(i)
 
-    if headers["version"] == "custom0":
+    if protoVer == "custom0":
         array = to_array_custom0(pixellist, width, height, colors)
-    if headers["version"] == [1]:
-        rooms = headers["roominfo"]
+    if protoVer == "1":
+        rooms = header["roominfo"]
         array = to_array_v1(pixellist, width, height, rooms, colors)
 
     image = Image.fromarray(array)
-    return headers, image
+    return image
 
 
 def get_map(
-    server: str, client_id: str, secret_key: str, device_id: str, colors={}
+    server: str, client_id: str, secret_key: str, device_id: str, colors={}, render_path=False
 ) -> Image:
     """Downloads and parses vacuum map from tuya cloud."""
-    map_link = get_download_link(server, client_id, secret_key, device_id)
-    header, mapdata = download_map(map_link)
-    return render_layout(header, mapdata, colors)
+
+    link = get_download_link(server, client_id, secret_key, device_id)
+    map_link = link["result"][0]["map_url"]
+    try:
+        path_link = link["result"][1]["map_url"]
+    except:
+        _LOGGER.error("Your vacuum doesn't return a path")
+
+    response = download(map_link)
+
+    if response.status_code != 200:
+        _LOGGER.warning("Got " + response.status_code + " from server whhle downloading map.")
+
+    _LOGGER.debug(
+        "Response: "
+        + str(response.status_code)
+        + str(base64.b64encode(response.content))
+        + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+    )
+
+    try:
+        header, mapDataArr = parse_map(response)
+    except Exception as e:
+        _LOGGER.error(
+            "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
+            + str(response.status_code)
+            + str(base64.b64encode(response.content))
+            + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+            + " Thank you!"
+        )
+        _LOGGER.error(e)
+
+    image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
+
+    if render_path:
+        _LOGGER.debug("Rendering path")
+
+        if colors == {}:
+            colors["path_color"] = [0, 255, 0]
+        
+        scale = int(1080/image.size[0])
+        image = image.resize((image.size[0]*scale, image.size[1]*scale), resample=Image.BOX)
+        response = download(path_link)
+        if response.status_code != 200:
+            _LOGGER.warning("Got " + response.status_code + " from server whhle downloading path.")
+        path = parse_path(response, scale=scale)
+        draw = ImageDraw.Draw(image)
+        draw.line(path, fill=tuple(colors["path_color"]), width=1)
+        return header, image
+    
+    return header, image
 
 
 if __name__ == "__main__":
     print("Running as main.py")
-    headers, mapdatas = download_map(
-        get_download_link(
-            input("Endpoint: "),
-            input("Client ID: "),
-            input("Client Secret: "),
-            input("Device ID: "),
-        )
+    _server = input("Endpoint: ")
+    _client_id = input("Client ID: ")
+    _secret_key = input("Client Secret: ")
+    _device_id = input("Device ID: ")
+    _render_path = input("Render path?")
+    if _render_path.lower() in ['true', '1', 't', 'y', 'yes']:
+        _render_bool = True
+    else:
+        _render_bool = False
+    _colors = {}
+    headers, map_data = get_map(
+        _server,
+        _client_id,
+        _secret_key,
+        _device_id,
+        _colors,
+        _render_bool,
     )
-    headers, vacmap = render_layout(headers, mapdatas)
-    vacmap.save("./vacmap.png")
+    map_data.save('vacmap.png')

@@ -11,7 +11,7 @@ from .tuya_vacuum_map_extractor import (
 )
 
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.selector import selector
 from homeassistant.const import (
     CONF_NAME,
@@ -38,9 +38,12 @@ from .const import (
     CONF_ROOM_COLORS,
     CONF_ROOM_COLOR,
     CONF_ROOM_NAME,
+    CONF_PATH,
+    CONF_PATH_COLOR,
     DEFAULT_BG_COLOR,
     DEFAULT_ROOM_COLOR,
     DEFAULT_WALL_COLOR,
+    DEFAULT_PATH_COLOR,
 )
 
 CONF_SERVERS = {
@@ -56,6 +59,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+
+    VERSION = 2
+
     def __init__(self) -> None:
         super().__init__()
         self.map_header = {}
@@ -109,6 +115,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_CLIENT_ID, default=default_client_id): str,
             vol.Required(CONF_CLIENT_SECRET, default=default_client_secret): str,
             vol.Required(CONF_DEVICE_ID, default=default_device_id): str,
+            vol.Required(CONF_PATH, default=False): bool,
             vol.Required(CONF_COLORS, default=False): bool,
         }
 
@@ -150,6 +157,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_WALL_COLOR: selector(
                 {"color_rgb": {}}  # TODO: default value of [255, 255, 255]
             ),
+            CONF_PATH_COLOR: selector(
+                {"color_rgb": {}}
+            ),
         }
 
         if "roominfo" in self.map_header:
@@ -184,7 +194,34 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="room_colors", data_schema=vol.Schema(DATA_SCHEMA), errors=errors
         )
+    
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        """Create the options flow."""
+        return OptionsFlowHandler(config_entry)
+    
+class OptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
 
+    async def async_step_init(self, user_input=None):
+        """Manage the options."""
+
+        data = {**self.config_entry.data}
+        path_default = data[CONF_PATH]
+
+        DATA_SCHEMA = {
+            vol.Required(CONF_PATH, default=path_default): bool,
+        }
+
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(step_id="init", data_schema=vol.Schema(DATA_SCHEMA))
 
 async def validate(hass: HomeAssistant, data: dict):
     """Validate the user input"""
@@ -210,7 +247,6 @@ def create_entry_data(data: dict, header: dict):
         else:
             for i in rooms:
                 del data[CONF_ROOM_NAME + str(i["ID"])]
-        print(data)
         for i in rooms:
             colors[CONF_ROOM_COLOR + str(i["ID"])] = data.pop(
                 CONF_ROOM_COLOR + str(i["ID"])
@@ -225,10 +261,12 @@ def create_entry_data(data: dict, header: dict):
         data[CONF_BG_COLOR] = DEFAULT_BG_COLOR
     if not CONF_WALL_COLOR in data:
         data[CONF_WALL_COLOR] = DEFAULT_WALL_COLOR
+    if not CONF_PATH_COLOR in data:
+        data[CONF_PATH_COLOR] = DEFAULT_PATH_COLOR
 
     colors[CONF_BG_COLOR] = data.pop(CONF_BG_COLOR)
     colors[CONF_WALL_COLOR] = data.pop(CONF_WALL_COLOR)
+    colors[CONF_PATH_COLOR] = data.pop(CONF_PATH_COLOR)
 
     data["colors"] = colors
-    print(data)
     return data

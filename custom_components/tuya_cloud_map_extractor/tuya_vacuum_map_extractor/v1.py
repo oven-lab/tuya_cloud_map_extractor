@@ -1,7 +1,14 @@
 import numpy as np
+import logging
 
-from .const import default_colors, types
 from .pylz4 import uncompress
+from .const import (
+    default_colors, 
+    types,
+    BYTE_HEADER_LENGHT_PATH_V1
+)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _hexStringToNumber(bits):
@@ -18,6 +25,22 @@ def _chunk(In, n):
     return out
 
 
+def _partition(string, chunk):
+    return [string[i:i + chunk] for i in range(0, len(string), chunk)]
+
+
+def _deal_pl(point):
+    return point - 65536 if point > 32768 else point
+
+
+def scale_number(scale, value):
+    return round(value / 10 ** scale, scale)
+
+
+def shrink_value(value):
+    return scale_number(1, value)
+
+
 def _highLowToInt(high, low):
     return low + (high << 8)
 
@@ -30,6 +53,14 @@ def _numberToBase(n, b):
         digits.append(int(n % b))
         n //= b
     return digits[::-1]
+
+
+def _format_path_point(origin_point, reverse_y = True):
+    x, y = origin_point['x'], origin_point['y']
+    if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+        raise ValueError(f"path point x or y is not number: x = {x}, y = {y}")
+    real_point = [shrink_value(x), -shrink_value(y)] if reverse_y else [shrink_value(x), shrink_value(y)]
+    return real_point
 
 
 def decode_header_v1(header: str):
@@ -111,6 +142,18 @@ def decode_roomArr(mapRoomArr):
 
     return rooms
 
+def decode_path_v1(pathdata):
+    header_length = BYTE_HEADER_LENGHT_PATH_V1 // 2
+    data_arr = _hexStringToNumber(pathdata)
+    path_data_arr = [data_arr[i:i + 4] for i in range(header_length, len(data_arr), 4)]
+
+    path_data = []
+    for point in path_data_arr:
+        x, y = [_deal_pl(_highLowToInt(high, low)) for high, low in _partition(point, 2)]
+        real_point = _format_path_point({'x': x, 'y': y})
+        path_data.append(real_point)
+
+    return path_data
 
 def to_array_v1(
     pixellist: list, width: int, height: int, rooms: dict, colors: dict
@@ -135,3 +178,17 @@ def to_array_v1(
         pixels.append(line)
         height_counter = height_counter + 1
     return np.array(pixels, dtype=np.uint8)
+
+
+def decode_v1(data):
+    header = decode_header_v1(data[0:48])
+    _LOGGER.debug(header)
+    mapArea = header["width"] * header["height"]
+    infoLength = 48 + header["totalcount"] * 2
+    encodeDataArray = bytes(_hexStringToNumber(data[48:infoLength]))
+    raw = uncompress(encodeDataArray)
+    mapDataArr = raw[0:mapArea]
+    mapRoomArr = raw[mapArea:]
+    header["roominfo"] = decode_roomArr(mapRoomArr)
+
+    return header, mapDataArr

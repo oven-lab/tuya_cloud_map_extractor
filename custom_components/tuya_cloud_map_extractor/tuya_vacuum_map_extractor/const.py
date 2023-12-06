@@ -1,3 +1,5 @@
+BYTE_HEADER_LENGHT_PATH_V1 = 26
+
 class types:
     """Number to type"""
 

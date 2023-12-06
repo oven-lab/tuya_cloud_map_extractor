@@ -14,12 +14,8 @@ from homeassistant.components.camera import (
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_CLIENT_ID,
-    CONF_CLIENT_SECRET,
-    CONF_DEVICE_ID,
-)
+
+from .const import CONF_PATH
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,6 +34,7 @@ async def async_setup_entry(
     secret_key = config.data["client_secret"]
     device_id = config.data["device_id"]
     colors = config.data["colors"]
+    render_path = config.data[CONF_PATH]
     _LOGGER.debug("Adding entities")
     async_add_entities(
         [
@@ -49,6 +46,7 @@ async def async_setup_entry(
                 secret_key,
                 device_id,
                 should_poll,
+                render_path,
                 colors,
             )
         ]
@@ -66,7 +64,8 @@ class VacuumCamera(Camera):
         secret_key: str,
         device_id: str,
         should_poll: bool,
-        colors={},
+        render_path: bool,
+        colors: dict,
     ) -> None:
         """Initialized camera."""
         _LOGGER.debug("Init camera")
@@ -87,6 +86,7 @@ class VacuumCamera(Camera):
         self._device_id = device_id
         self._attr_unique_id = client_id + device_id
         self._colors = colors
+        self._render_path = render_path
 
     async def async_added_to_hass(self) -> None:
         self.async_schedule_update_ha_state(True)
@@ -129,6 +129,7 @@ class VacuumCamera(Camera):
                 self._secret_key,
                 self._device_id,
                 self._colors,
+                self._render_path,
             )
             _LOGGER.debug("Map data retrieved")
         except Exception as error:
