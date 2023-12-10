@@ -27,6 +27,9 @@ To install this integration, manually add the contents of custom_components to y
 ### Configuration in Home Assistant
 After the installation of this integration into Home Assistant, the integration is configured via config flow. Add a new integration via the UI and choose "Tuya Vacuum Map Extractor". Then enter your Tuya IoT platform credentials.
 
+### Turn on and turn off
+By default, the vacuum map camera is turned off. You have to manually call the service camera.turn_on and camera.turn_off. I would recommend [this](https://raw.githubusercontent.com/PiotrMachowski/Home-Assistant-custom-components-Xiaomi-Cloud-Map-Extractor/master/blueprints/automation/disable_vacuum_camera_update_when_docked.yaml) blueprint to automatically turn on and off camera updates depending on if the vacuum is docked or not.
+
 ## Supported devices
 Following is a list of currently supported devices (confirmed tested by individual users): 
 
