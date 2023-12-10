@@ -114,6 +114,9 @@ def get_map(
     image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
 
     if render_path:
+        if header["version"] == "custom0":
+            return header, image
+        
         _LOGGER.debug("Rendering path")
 
         if "path_color" not in colors:
