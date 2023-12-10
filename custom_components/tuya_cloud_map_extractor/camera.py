@@ -32,7 +32,10 @@ async def async_setup_entry(
     client_id = config.data["client_id"]
     secret_key = config.data["client_secret"]
     device_id = config.data["device_id"]
-    colors = config.data["colors"]
+    if "colors" in config.data:
+        colors = config.data["colors"]
+    else:
+        colors = {}
     path_settings = {CONF_PATH: config.data[CONF_PATH], "last": config.data[CONF_LAST]}
     _LOGGER.debug("Adding entities")
     async_add_entities(
