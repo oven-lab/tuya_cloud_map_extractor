@@ -63,7 +63,8 @@
         "step": {
             "init": {
                 "data": {
-                    "path_enabled": "Show path"
+                    "path_enabled": "Show path",
+                    "last": "Vacuum position last reported position. (If unchecked, the latest reported position)"
                 }
             }
         }

@@ -31,27 +31,26 @@ def tuyarequest(
     return requests.get(url=server + url, headers=headers, timeout=2.5).json()
 
 def get_download_link(
-    server: str, client_id: str, secret_key: str, device_id: str, token=""
+    server: str, client_id: str, secret_key: str, device_id: str
 ) -> str:
     """Gets the download link of the real time map."""
 
-    if token == "":
-        url = "/v1.0/token?grant_type=1"
-        response = tuyarequest(
-            server=server, url=url, client_id=client_id, secret_key=secret_key
-        )
+    url = "/v1.0/token?grant_type=1"
+    response = tuyarequest(
+        server=server, url=url, client_id=client_id, secret_key=secret_key
+    )
 
-        if not response["success"]:
-            if response["msg"] == "clientId is invalid":
-                raise ClientIDError("Invalid Client ID")
-            elif response["msg"] == "sign invalid":
-                raise ClientSecretError("Invalid Client Secret")
-            elif "cross-region access is not allowed" in response["msg"]:
-                raise ServerError("Wrong server region. Cross-region access is not allowed.")
-            else:
-                raise RuntimeError("Request failed - Response: ", response)
+    if not response["success"]:
+        if response["msg"] == "clientId is invalid":
+            raise ClientIDError("Invalid Client ID")
+        elif response["msg"] == "sign invalid":
+            raise ClientSecretError("Invalid Client Secret")
+        elif "cross-region access is not allowed" in response["msg"]:
+            raise ServerError("Wrong server region. Cross-region access is not allowed.")
+        else:
+            raise RuntimeError("Request failed - Response: ", response)
 
-        access_token = response["result"]["access_token"]
+    access_token = response["result"]["access_token"]
 
     url = "/v1.0/users/sweepers/file/" + device_id + "/realtime-map"
     response = tuyarequest(

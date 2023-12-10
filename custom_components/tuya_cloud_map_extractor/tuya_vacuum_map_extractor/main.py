@@ -1,8 +1,10 @@
 """Downloads and renders vacuum map from tuya servers."""
 import base64
 import requests
+import math
 
 from requests.exceptions import JSONDecodeError
+from datetime import datetime
 
 # import lz4.block
 import logging
@@ -73,14 +75,26 @@ def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
 
 
 def get_map(
-    server: str, client_id: str, secret_key: str, device_id: str, colors={}, path_settings={}
+    server: str, client_id: str, secret_key: str, device_id: str, colors={}, path_settings={}, urls={}
 ) -> Image:
     """Downloads and parses vacuum map from tuya cloud."""
 
     render_path = path_settings["path_enabled"]
     last = path_settings["last"]
+    if urls != {}:
+        time = datetime.strptime(urls["time"], "%H:%M:%S")
+        now = datetime.now().strftime("%H:%M:%S")
+        now = datetime.strptime(now, "%H:%M:%S")
+        delta = now-time
+        minutes_delta = math.ceil(delta.total_seconds() / 60)
+        if minutes_delta < 59:
+            link = {}
+            link["result"] = urls["links"]
+        else:
+            link = get_download_link(server, client_id, secret_key, device_id)
+    else:
+        link = get_download_link(server, client_id, secret_key, device_id)
 
-    link = get_download_link(server, client_id, secret_key, device_id)
     map_link = link["result"][0]["map_url"]
     try:
         path_link = link["result"][1]["map_url"]
@@ -112,6 +126,14 @@ def get_map(
         _LOGGER.error(e)
 
     image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
+
+    if urls == {}:
+        header["urls"] = {
+            "links": link["result"],
+            "time": datetime.now().strftime("%H:%M:%S"),
+        }
+    else:
+        header["urls"] = urls
 
     if render_path:
         if header["version"] == "custom0":

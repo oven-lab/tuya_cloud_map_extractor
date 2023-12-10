@@ -63,7 +63,8 @@
         "step": {
             "init": {
                 "data": {
-                    "path_enabled": "Visa rutt"
+                    "path_enabled": "Visa rutt",
+                    "last": "Dammsugarens position den sista meddelade positionen (om urkryssad, den första meddelade positionen)"
                 }
             }
         }

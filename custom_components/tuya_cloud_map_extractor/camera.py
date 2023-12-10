@@ -85,6 +85,7 @@ class VacuumCamera(Camera):
         self._attr_unique_id = client_id + device_id
         self._colors = colors
         self._path_settings = path_settings
+        self._urls = {}
         self._init = True
 
     async def async_added_to_hass(self) -> None:
@@ -135,6 +136,7 @@ class VacuumCamera(Camera):
                 self._device_id,
                 self._colors,
                 self._path_settings,
+                self._urls
             )
             _LOGGER.debug("Map data retrieved")
         except Exception as error:
@@ -146,6 +148,7 @@ class VacuumCamera(Camera):
             _LOGGER.debug("Map is ok")
             self._set_map_data(map_data)
             self._set_extra_attr(headers)
+            self._urls = headers["urls"]
             self._status = CameraStatus.OK
 
         if self._init:
