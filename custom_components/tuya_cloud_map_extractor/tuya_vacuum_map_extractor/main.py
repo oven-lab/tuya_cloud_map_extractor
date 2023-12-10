@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from .v1 import decode_v1, to_array_v1, decode_path_v1
 from .custom0 import decode_custom0, to_array_custom0
 from .tuya import get_download_link
+from .const import PixelValueNotDefined
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,6 +67,7 @@ def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
 
     if protoVer == "custom0":
         array = to_array_custom0(pixellist, width, height, colors)
+
     if protoVer == "1":
         rooms = header["roominfo"]
         array = to_array_v1(pixellist, width, height, rooms, colors)
@@ -123,9 +125,19 @@ def get_map(
             + str(base64.b64encode(bytes(str(map_link), "utf-8")))
             + " Thank you!"
         )
-        _LOGGER.error(e)
+        _LOGGER.exception(e)
 
-    image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
+    try:
+        image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
+    except PixelValueNotDefined as e:
+        _LOGGER.error(
+            "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
+            + str(response.status_code)
+            + str(base64.b64encode(response.content))
+            + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+            + " Thank you!"
+        )
+        raise e
 
     if urls == {}:
         header["urls"] = {

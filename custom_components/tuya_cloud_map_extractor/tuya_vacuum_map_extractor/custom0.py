@@ -3,7 +3,7 @@ import logging
 import numpy as np
 
 from .pylz4 import uncompress
-from .const import default_colors, types
+from .const import default_colors, types, PixelValueNotDefined
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,12 @@ def to_array_custom0(
             pixeltype = types.custom0.get(
                 pixellist[width_counter + height_counter * width]
             )
-            pixel = colors[pixeltype]
+
+            if pixeltype != None:
+                pixel = colors[pixeltype]
+            else:
+                raise PixelValueNotDefined
+
             line.append(pixel)
             width_counter = width_counter + 1
         pixels.append(line)

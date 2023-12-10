@@ -130,6 +130,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 user_input[CONF_BG_COLOR] = [0, 0, 0]
             if not CONF_WALL_COLOR in user_input:
                 user_input[CONF_WALL_COLOR] = [0, 0, 0]
+            if not CONF_PATH_COLOR in user_input:
+                user_input[CONF_PATH_COLOR] = [0, 0, 0]
 
             if CONF_ROOM_COLORS in user_input:
                 if user_input[CONF_ROOM_COLORS]:
@@ -157,7 +159,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_WALL_COLOR: selector(
                 {"color_rgb": {}}  # TODO: default value of [255, 255, 255]
             ),
-            CONF_PATH_COLOR: selector({"color_rgb": {}}),
+            CONF_PATH_COLOR: selector(
+                {"color_rgb": {}}
+            ),
         }
 
         if "roominfo" in self.map_header:

@@ -223,3 +223,6 @@ class ClientSecretError(Exception):
 
 class DeviceIDError(Exception):
     pass
+
+class PixelValueNotDefined(Exception):
+    pass
