@@ -188,7 +188,11 @@ def decode_v1(data):
     encodeDataArray = bytes(_hexStringToNumber(data[48:infoLength]))
     raw = uncompress(encodeDataArray)
     mapDataArr = raw[0:mapArea]
-    mapRoomArr = raw[mapArea:]
-    header["roominfo"] = decode_roomArr(mapRoomArr)
+    try:
+        mapRoomArr = raw[mapArea:]
+        header["roominfo"] = decode_roomArr(mapRoomArr)
+    except IndexError:
+        header["roominfo"] = []
+        _LOGGER.debug("No rooms v1")
 
     return header, mapDataArr

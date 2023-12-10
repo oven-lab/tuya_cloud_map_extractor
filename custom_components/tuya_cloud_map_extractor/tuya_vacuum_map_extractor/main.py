@@ -123,7 +123,7 @@ def get_map(
         image = image.resize((image.size[0]*scale, image.size[1]*scale), resample=Image.BOX)
         response = download(path_link)
         if response.status_code != 200:
-            _LOGGER.warning("Got " + response.status_code + " from server whhle downloading path.")
+            _LOGGER.warning("Got " + response.status_code + " from server while downloading path.")
         path = parse_path(response, scale=scale)
         draw = ImageDraw.Draw(image)
         draw.line(path, fill=tuple(colors["path_color"]), width=1)

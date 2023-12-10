@@ -27,7 +27,6 @@ async def async_setup_entry(
 ):
     _LOGGER.debug("Async setup entry")
     name = config.title
-    should_poll = False
     entity_id = generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
     server = config.data["server"]
     client_id = config.data["client_id"]
@@ -45,7 +44,6 @@ async def async_setup_entry(
                 client_id,
                 secret_key,
                 device_id,
-                should_poll,
                 path_settings,
                 colors,
             )
@@ -63,7 +61,6 @@ class VacuumCamera(Camera):
         client_id: str,
         secret_key: str,
         device_id: str,
-        should_poll: bool,
         path_settings: dict,
         colors: dict,
     ) -> None:
@@ -76,8 +73,6 @@ class VacuumCamera(Camera):
         self._device = None
         self._attr_name = name
         self._server = server
-        self._access_token = ""
-        self._should_poll = should_poll
         self._image = None
         self._extra_state_attr = None
         self._map_data = None
@@ -87,6 +82,7 @@ class VacuumCamera(Camera):
         self._attr_unique_id = client_id + device_id
         self._colors = colors
         self._path_settings = path_settings
+        self._init = True
 
     async def async_added_to_hass(self) -> None:
         self.async_schedule_update_ha_state(True)
@@ -97,8 +93,10 @@ class VacuumCamera(Camera):
 
     @property
     def should_poll(self) -> bool:
-        print("should_poll: ", self._should_poll)
-        return self._should_poll
+        if self._status in [CameraStatus.OK, CameraStatus.INITIALIZING]:
+            return True
+        else:
+            return False
 
     @property
     def frame_interval(self) -> float:
@@ -107,21 +105,24 @@ class VacuumCamera(Camera):
     @property
     def state(self) -> str:
         _LOGGER.debug("Fetching state")
-        if self._should_poll == True:
-            if self._status == CameraStatus.OK:
-                return "on"
-            if self._status == CameraStatus.FAILURE:
-                return "error"
-            else:
-                return "unknown"
-        else:
+        if self._status == CameraStatus.OK:
+            return "on"
+        if self._status == CameraStatus.FAILURE:
+            return "error"
+        if self._status == CameraStatus.OFF:
             return "off"
+        if self._status == CameraStatus.INITIALIZING:
+            return "initializing"
+        return "unknown"
 
     @property
     def extra_state_attributes(self) -> dict:
         return self._extra_state_attr
 
     def update(self):
+        if self._status == CameraStatus.OFF:
+            return
+
         try:
             _LOGGER.debug("Getting map")
             headers, map_data = get_map(
@@ -143,6 +144,10 @@ class VacuumCamera(Camera):
             self._set_map_data(map_data)
             self._set_extra_attr(headers)
             self._status = CameraStatus.OK
+
+        if self._init:
+            self._init = False
+            self._status = CameraStatus.OFF
 
     def _set_map_data(self, map_data):
         img_byte_arr = io.BytesIO()
@@ -183,14 +188,15 @@ class VacuumCamera(Camera):
         return self._image
 
     def turn_on(self):
-        self._should_poll = True
+        self._status = CameraStatus.INITIALIZING
 
     def turn_off(self):
-        self._should_poll = False
-        self.async_schedule_update_ha_state()
+        self._status = CameraStatus.OFF
+        self.async_schedule_update_ha_state(True)
 
 
 class CameraStatus(Enum):
     INITIALIZING = "Initializing"
     OK = "OK"
+    OFF = "OFF"
     FAILURE = "Faliure"
