@@ -22,30 +22,7 @@ from homeassistant.const import (
 
 import voluptuous as vol
 
-from .const import (
-    DOMAIN,
-    CONF_SERVER,
-    CONF_SERVER_CHINA,
-    CONF_SERVER_WEST_AMERICA,
-    CONF_SERVER_EAST_AMERICA,
-    CONF_SERVER_CENTRAL_EUROPE,
-    CONF_SERVER_WEST_EUROPE,
-    CONF_SERVER_INDIA,
-    CONF_COLORS,
-    CONF_BG_COLOR,
-    CONF_WALL_COLOR,
-    CONF_INSIDE_COLOR,
-    CONF_ROOM_COLORS,
-    CONF_ROOM_COLOR,
-    CONF_ROOM_NAME,
-    CONF_PATH,
-    CONF_PATH_COLOR,
-    CONF_LAST,
-    DEFAULT_BG_COLOR,
-    DEFAULT_ROOM_COLOR,
-    DEFAULT_WALL_COLOR,
-    DEFAULT_PATH_COLOR,
-)
+from .const import *
 
 CONF_SERVERS = {
     CONF_SERVER_CHINA: "China",
@@ -60,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         super().__init__()
@@ -221,6 +198,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         DATA_SCHEMA = {
             vol.Required(CONF_PATH, default=path_default): bool,
             vol.Required(CONF_LAST, default=last_default): bool,
+            vol.Required(CONF_ROTATE, default=data[CONF_ROTATE]): vol.In(CONF_ROTATES),
+            vol.Required(CONF_FLIP_HORIZONTAL, default=data[CONF_FLIP_HORIZONTAL]): bool,
+            vol.Required(CONF_FLIP_VERTICAL, default=data[CONF_FLIP_VERTICAL]): bool,
         }
 
         if user_input is not None:
@@ -238,7 +218,13 @@ async def validate(hass: HomeAssistant, data: dict):
         data["client_secret"],
         data["device_id"],
         {},
-        {CONF_PATH: data["path_enabled"], "last": True},
+        {
+            CONF_PATH: data["path_enabled"],
+            CONF_LAST: True,
+            CONF_ROTATE: 0,
+            CONF_FLIP_HORIZONTAL: False,
+            CONF_FLIP_VERTICAL: False,
+        },
     )
 
 
@@ -273,6 +259,9 @@ def create_entry_data(data: dict, header: dict):
         data[CONF_PATH_COLOR] = DEFAULT_PATH_COLOR
 
     data[CONF_LAST] = True
+    data[CONF_ROTATE] = 0
+    data[CONF_FLIP_HORIZONTAL] = False
+    data[CONF_FLIP_VERTICAL] = False
 
     colors[CONF_BG_COLOR] = data.pop(CONF_BG_COLOR)
     colors[CONF_WALL_COLOR] = data.pop(CONF_WALL_COLOR)

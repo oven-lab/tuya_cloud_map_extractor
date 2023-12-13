@@ -64,7 +64,10 @@
             "init": {
                 "data": {
                     "path_enabled": "Show path",
-                    "last": "Vacuum position last reported position. (If unchecked, the latest reported position)"
+                    "last": "Vacuum position last reported position. (If unchecked, the latest reported position)",
+                    "rotate": "Rotate:",
+                    "flip_horizontal": "Flip horizontal",
+                    "flip_vertical": "Flip vertical"
                 }
             }
         }

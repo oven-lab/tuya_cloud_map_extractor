@@ -7,6 +7,11 @@ from .const import default_colors, types, PixelValueNotDefined
 
 _LOGGER = logging.getLogger(__name__)
 
+def map_to_image(point: list, resolution, x_min, y_min):
+    x_min_calc = x_min/resolution
+    y_min_calc = y_min/resolution
+    return [abs(point[0] / 1000 / resolution - x_min_calc), abs(point[1] / 1000 / resolution - y_min_calc)]
+
 def decode_custom0(data):
     binary_data = base64.b64decode(data["data"]["map"])
     width = data["data"]["width"]
@@ -21,7 +26,30 @@ def decode_custom0(data):
         "y_min": data["data"]["y_min"],
         "mapResolution": data["data"]["resolution"],
     }
+    if "pathId" in data["data"]:
+        header["path_id"] = data["data"]["pathId"]
+    if "area" in data["data"]:
+        areas = []
+        for area in data["data"]["area"]:
+            room = {"name": area["name"], "id": area["id"], "type": area["active"]}
+            room_vertexs = []
+            for vertex in area["vertexs"]:
+                room_vertexs.append(map_to_image(vertex, header["mapResolution"], header["x_min"], header["y_min"]))
+            room["vertexs"] = room_vertexs
+            areas.append(room)
+        header["area"] = areas
+
     return header, bytes_map
+
+def decode_path_custom0(data, header):
+    resolution = header["mapResolution"]
+    x_min = header["x_min"]
+    y_min = header["y_min"]
+    coords = []
+    for i in data["data"]["posArray"]:
+        coord = map_to_image(i, resolution, x_min, y_min)
+        coords.append(coord)
+    return coords
 
 def to_array_custom0(
     pixellist: list, width: int, height: int, colors: dict

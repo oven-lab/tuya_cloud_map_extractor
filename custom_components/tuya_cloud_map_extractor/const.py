@@ -23,6 +23,21 @@ CONF_ROOM_NAME = "room_name_"
 CONF_PATH = "path_enabled"
 CONF_PATH_COLOR = "path_color"
 CONF_LAST = "last"
+CONF_ROTATE = "rotate"
+CONF_FLIP_VERTICAL = "flip_vertical"
+CONF_FLIP_HORIZONTAL = "flip_horizontal"
+
+CONF_ROTATE_0 = 0
+CONF_ROTATE__90 = -90
+CONF_ROTATE_90 = 90
+CONF_ROTATE_180 = 180
+
+CONF_ROTATES = {
+    CONF_ROTATE__90: "-90",
+    CONF_ROTATE_0: "0",
+    CONF_ROTATE_90: "90",
+    CONF_ROTATE_180: "180"
+}
 
 DEFAULT_BG_COLOR = [44, 50, 64]
 DEFAULT_WALL_COLOR = [255, 255, 255]

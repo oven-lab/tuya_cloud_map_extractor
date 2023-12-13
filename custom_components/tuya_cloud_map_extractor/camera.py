@@ -15,7 +15,7 @@ from homeassistant.components.camera import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import generate_entity_id
 
-from .const import CONF_PATH, CONF_LAST
+from .const import CONF_PATH, CONF_LAST, CONF_ROTATE, CONF_FLIP_HORIZONTAL, CONF_FLIP_VERTICAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,7 +36,13 @@ async def async_setup_entry(
         colors = config.data["colors"]
     else:
         colors = {}
-    path_settings = {CONF_PATH: config.data[CONF_PATH], "last": config.data[CONF_LAST]}
+    settings = {
+        CONF_PATH: config.data[CONF_PATH],
+        CONF_LAST: config.data[CONF_LAST],
+        CONF_ROTATE: config.data[CONF_ROTATE],
+        CONF_FLIP_HORIZONTAL: config.data[CONF_FLIP_HORIZONTAL],
+        CONF_FLIP_VERTICAL: config.data[CONF_FLIP_VERTICAL]
+    }
     _LOGGER.debug("Adding entities")
     async_add_entities(
         [
@@ -47,7 +53,7 @@ async def async_setup_entry(
                 client_id,
                 secret_key,
                 device_id,
-                path_settings,
+                settings,
                 colors,
             )
         ]
@@ -64,7 +70,7 @@ class VacuumCamera(Camera):
         client_id: str,
         secret_key: str,
         device_id: str,
-        path_settings: dict,
+        settings: dict,
         colors: dict,
     ) -> None:
         """Initialized camera."""
@@ -84,7 +90,7 @@ class VacuumCamera(Camera):
         self._device_id = device_id
         self._attr_unique_id = client_id + device_id
         self._colors = colors
-        self._path_settings = path_settings
+        self._settings = settings
         self._urls = {}
         self._init = True
 
@@ -135,7 +141,7 @@ class VacuumCamera(Camera):
                 self._secret_key,
                 self._device_id,
                 self._colors,
-                self._path_settings,
+                self._settings,
                 self._urls
             )
             _LOGGER.debug("Map data retrieved")

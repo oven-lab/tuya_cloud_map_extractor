@@ -8,7 +8,15 @@ from homeassistant.const import Platform
 
 PLATFORMS = [Platform.CAMERA]
 
-from .const import DOMAIN, CONF_PATH, CONF_LAST
+from .const import (
+    DOMAIN,
+    CONF_PATH,
+    CONF_LAST,
+    CONF_ROTATE,
+    CONF_ROTATE_0,
+    CONF_FLIP_HORIZONTAL,
+    CONF_FLIP_VERTICAL,
+)
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -33,9 +41,20 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
     _LOGGER.debug("Migrating from version %s", config_entry.version)
 
     if config_entry.version == 1:
-        data = config_entry.data
         data = {**config_entry.data}
         data[CONF_PATH] = True
+        data[CONF_ROTATE] = CONF_ROTATE_0
+        data[CONF_FLIP_HORIZONTAL] = False
+        data[CONF_FLIP_VERTICAL] = False
+
+        hass.config_entries.async_update_entry(config_entry, data=data)
+
+    if config_entry.version == 2:
+        data = config_entry.data
+        data = {**config_entry.data}
+        data[CONF_ROTATE] = CONF_ROTATE_0
+        data[CONF_FLIP_HORIZONTAL] = False
+        data[CONF_FLIP_VERTICAL] = False
 
         hass.config_entries.async_update_entry(config_entry, data=data)
 
@@ -54,6 +73,9 @@ async def update_listener(hass: HomeAssistant, config_entry: ConfigEntry):
 
     data[CONF_PATH] = options[CONF_PATH]
     data[CONF_LAST] = options[CONF_LAST]
+    data[CONF_ROTATE] = options[CONF_ROTATE]
+    data[CONF_FLIP_HORIZONTAL] = options[CONF_FLIP_HORIZONTAL]
+    data[CONF_FLIP_VERTICAL] = options[CONF_FLIP_VERTICAL]
 
     hass.config_entries.async_update_entry(config_entry, data=data)
     await async_setup_entry(hass, config_entry)

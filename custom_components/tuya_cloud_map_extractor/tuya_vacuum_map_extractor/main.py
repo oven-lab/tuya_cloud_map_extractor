@@ -10,7 +10,7 @@ from datetime import datetime
 import logging
 from PIL import Image, ImageDraw
 from .v1 import decode_v1, to_array_v1, decode_path_v1
-from .custom0 import decode_custom0, to_array_custom0
+from .custom0 import decode_custom0, to_array_custom0, decode_path_custom0
 from .tuya import get_download_link
 from .const import PixelValueNotDefined
 
@@ -33,10 +33,10 @@ def parse_map(response: requests.models.Response):
 
     return header, mapDataArr
 
-def parse_path(response: requests.models.Response, scale=2.0):
+def parse_path(response: requests.models.Response, scale=2.0, header={}):
     try:
         data = response.json()
-        path_data = [[]]
+        path_data = decode_path_custom0(data, header)
     except JSONDecodeError:
         data = response.content.hex()
         path_data = decode_path_v1(data)
@@ -48,7 +48,22 @@ def parse_path(response: requests.models.Response, scale=2.0):
 
     return coords
 
+def flip(headers: dict, image: Image.Image, settings: dict):
+    rotate = settings["rotate"]
+    flip_vertical = settings["flip_vertical"]
+    flip_horizontal = settings["flip_horizontal"]
+    if rotate == 90:
+        image = image.transpose(Image.ROTATE_90)
+    elif rotate == 180:
+        image = image.transpose(Image.ROTATE_180)
+    elif rotate == -90:
+        image = image.transpose(Image.ROTATE_270)
+    if flip_vertical:
+        image = image.transpose(Image.FLIP_LEFT_RIGHT)
+    if flip_horizontal:
+        image = image.transpose(Image.FLIP_TOP_BOTTOM)
 
+    return headers, image
 
 def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
     """Renders the layout map."""
@@ -77,12 +92,11 @@ def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
 
 
 def get_map(
-    server: str, client_id: str, secret_key: str, device_id: str, colors={}, path_settings={}, urls={}
+    server: str, client_id: str, secret_key: str, device_id: str, colors={}, settings={}, urls={}
 ) -> Image:
     """Downloads and parses vacuum map from tuya cloud."""
-
-    render_path = path_settings["path_enabled"]
-    last = path_settings["last"]
+    render_path = settings["path_enabled"]
+    last = settings["last"]
     if urls != {}:
         time = datetime.strptime(urls["time"], "%H:%M:%S")
         now = datetime.now().strftime("%H:%M:%S")
@@ -96,6 +110,8 @@ def get_map(
             link = get_download_link(server, client_id, secret_key, device_id)
     else:
         link = get_download_link(server, client_id, secret_key, device_id)
+
+    print(link)
 
     map_link = link["result"][0]["map_url"]
     try:
@@ -112,7 +128,7 @@ def get_map(
         "Response: "
         + str(response.status_code)
         + str(base64.b64encode(response.content))
-        + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+        + str(base64.b64encode(bytes(str(link), "utf-8")))
     )
 
     try:
@@ -122,7 +138,7 @@ def get_map(
             "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
             + str(response.status_code)
             + str(base64.b64encode(response.content))
-            + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+            + str(base64.b64encode(bytes(str(link), "utf-8")))
             + " Thank you!"
         )
         _LOGGER.exception(e)
@@ -134,7 +150,7 @@ def get_map(
             "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
             + str(response.status_code)
             + str(base64.b64encode(response.content))
-            + str(base64.b64encode(bytes(str(map_link), "utf-8")))
+            + str(base64.b64encode(bytes(str(link), "utf-8")))
             + " Thank you!"
         )
         raise e
@@ -148,9 +164,6 @@ def get_map(
         header["urls"] = urls
 
     if render_path:
-        if header["version"] == "custom0":
-            return header, image
-        
         _LOGGER.debug("Rendering path")
 
         if "path_color" not in colors:
@@ -161,8 +174,8 @@ def get_map(
         response = download(path_link)
         if response.status_code != 200:
             _LOGGER.warning("Got " + response.status_code + " from server while downloading path.")
-        path = parse_path(response, scale=scale)
-        draw = ImageDraw.Draw(image)
+        path = parse_path(response, scale=scale, header=header)
+        draw = ImageDraw.Draw(image, 'RGBA')
         draw.line(path, fill=tuple(colors["path_color"]), width=1)
 
         if last:
@@ -172,29 +185,17 @@ def get_map(
 
         draw.ellipse([(x-5, y-5), (x+5, y+5)], outline=(255, 255, 255), fill=(0, 0, 255), width=1)
 
-        return header, image
+        if "area" in header:
+            for area in header["area"]:
+                coords = []
+                for i in area["vertexs"]:
+                    coords.append(i[0]*scale)
+                    coords.append(i[1]*scale)
+                if area["type"] == "forbid":
+                    draw.polygon(coords, outline=(255,255,255), width=1, fill=(255, 210, 0, 128))
+                else:
+                    draw.polygon(coords, outline=(255,255,255), width=1, fill=(255, 255, 255, 64))
+
+        return flip(header, image, settings)
     
-    return header, image
-
-
-if __name__ == "__main__":
-    print("Running as main.py")
-    _server = input("Endpoint: ")
-    _client_id = input("Client ID: ")
-    _secret_key = input("Client Secret: ")
-    _device_id = input("Device ID: ")
-    _render_path = input("Render path?")
-    if _render_path.lower() in ['true', '1', 't', 'y', 'yes']:
-        _render_bool = True
-    else:
-        _render_bool = False
-    _colors = {}
-    headers, map_data = get_map(
-        _server,
-        _client_id,
-        _secret_key,
-        _device_id,
-        _colors,
-        _render_bool,
-    )
-    map_data.save('vacmap.png')
+    return flip(header, image, settings)

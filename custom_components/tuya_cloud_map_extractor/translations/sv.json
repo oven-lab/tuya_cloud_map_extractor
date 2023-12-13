@@ -64,7 +64,10 @@
             "init": {
                 "data": {
                     "path_enabled": "Visa rutt",
-                    "last": "Dammsugarens position den sista meddelade positionen (om urkryssad, den första meddelade positionen)"
+                    "last": "Dammsugarens position den sista meddelade positionen (om urkryssad, den första meddelade positionen)",
+                    "rotate": "Rotera:",
+                    "flip_horizontal": "Spegla horisontellt",
+                    "flip_vertical": "Spegla vertikalt"
                 }
             }
         }
