@@ -12,6 +12,23 @@ def map_to_image(point: list, resolution, x_min, y_min):
     y_min_calc = y_min/resolution
     return [abs(point[0] / 1000 / resolution - x_min_calc), abs(point[1] / 1000 / resolution - y_min_calc)]
 
+def image_to_map(point: list, resolution, x_min, y_min):
+    x_min_calc = x_min/resolution
+    y_min_calc = y_min/resolution
+    return [(point[0] + x_min_calc) * resolution * 1000,(point[1] + y_min_calc) * resolution * 1000]
+
+def create_calibration_points(resolution, x_min, y_min):
+    cal_points = []
+    points = [[0, 0], [0, 20], [20, 0]]
+    for point in points:
+        cal = image_to_map(point, resolution, x_min, y_min)
+        cal_points.append({
+            "vacuum": {"x": point[0], "y": point[1]},
+            "map": {"x": cal[0], "y": cal[1]}
+        })
+
+    return cal_points
+
 def decode_custom0(data):
     binary_data = base64.b64decode(data["data"]["map"])
     width = data["data"]["width"]
@@ -25,6 +42,7 @@ def decode_custom0(data):
         "x_min": data["data"]["x_min"],
         "y_min": data["data"]["y_min"],
         "mapResolution": data["data"]["resolution"],
+        "calibrationPoints": create_calibration_points(data["data"]["resolution"], data["data"]["x_min"], data["data"]["y_min"])
     }
     if "pathId" in data["data"]:
         header["path_id"] = data["data"]["pathId"]

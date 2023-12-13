@@ -173,7 +173,7 @@ class VacuumCamera(Camera):
         self._extra_state_attr["width"] = headers["width"]
         self._extra_state_attr["height"] = headers["height"]
         self._extra_state_attr["resolution"] = headers["mapResolution"]
-        self._extra_state_attr["colors"] = self._colors
+        self._extra_state_attr["calibration_points"] = headers["calibrationPoints"]
         if "pileX" in headers:
             self._extra_state_attr["pileX"] = headers["pileX"]
             self._extra_state_attr["pileY"] = headers["pileY"]

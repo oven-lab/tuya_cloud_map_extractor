@@ -87,6 +87,18 @@ def decode_header_v1(header: str):
         "totalcount": int(header[36:44], 16),
         "compressbeforelength": int(header[36:44], 16),
         "compressafterlenght": maxmin[11],
+        "calibrationPoints": [{
+            'vacuum': {'x': 0, 'y': 0}, 
+            'map': {'x': 0.0, 'y': -0.0}
+        }, 
+        {
+            'vacuum': {'x': 0, 'y': 200}, 
+            'map': {'x': 0.0, 'y': -20.0}
+        }, 
+        {
+            'vacuum': {'x': 200, 'y': 0}, 
+            'map': {'x': 20.0, 'y': -0.0}
+        }]
     }
 
 
