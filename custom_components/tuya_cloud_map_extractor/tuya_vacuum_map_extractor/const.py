@@ -5,6 +5,31 @@ class types:
 
     custom0 = {
         0: "wall_color",  # wall
+        1: "room_color",
+        2: "room_color",
+        3: "room_color",
+        4: "room_color",
+        5: "room_color",
+        6: "room_color",
+        7: "room_color",
+        8: "room_color",
+        9: "room_color",
+        10: "room_color",
+        11: "room_color",
+        12: "room_color",
+        13: "room_color",
+        14: "room_color",
+        15: "room_color",
+        16: "room_color",
+        17: "room_color",
+        18: "room_color",
+        19: "room_color",
+        20: "room_color",
+        21: "room_color",
+        22: "room_color",
+        23: "room_color",
+        24: "room_color",
+        25: "room_color",
         127: "bg_color",  # bg
         255: "inside_color",  # inside
     }

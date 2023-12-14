@@ -111,13 +111,7 @@ def get_map(
     else:
         link = get_download_link(server, client_id, secret_key, device_id)
 
-    print(link)
-
     map_link = link["result"][0]["map_url"]
-    try:
-        path_link = link["result"][1]["map_url"]
-    except:
-        _LOGGER.error("Your vacuum doesn't return a path")
 
     response = download(map_link)
 
@@ -133,19 +127,8 @@ def get_map(
 
     try:
         header, mapDataArr = parse_map(response)
-    except Exception as e:
-        _LOGGER.error(
-            "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
-            + str(response.status_code)
-            + str(base64.b64encode(response.content))
-            + str(base64.b64encode(bytes(str(link), "utf-8")))
-            + " Thank you!"
-        )
-        _LOGGER.exception(e)
-
-    try:
         image = render_layout(raw_map=mapDataArr, header=header, colors=colors)
-    except PixelValueNotDefined as e:
+    except Exception as e:
         _LOGGER.error(
             "Unsupported data type. Include the following data in a github issue to request the data format to be added: "
             + str(response.status_code)
@@ -165,6 +148,11 @@ def get_map(
 
     if render_path:
         _LOGGER.debug("Rendering path")
+        try:
+            path_link = link["result"][1]["map_url"]
+        except:
+            _LOGGER.error("Your vacuum doesn't return a path")
+            return flip(header, image, settings)
 
         if "path_color" not in colors:
             colors["path_color"] = [0, 255, 0]
@@ -185,8 +173,8 @@ def get_map(
 
         draw.ellipse([(x-5, y-5), (x+5, y+5)], outline=(255, 255, 255), fill=(0, 0, 255), width=1)
 
-        if "area" in header:
-            for area in header["area"]:
+        if "roominfo" in header and header["version"] == "custom0":
+            for area in header["roominfo"]:
                 coords = []
                 for i in area["vertexs"]:
                     coords.append(i[0]*scale)

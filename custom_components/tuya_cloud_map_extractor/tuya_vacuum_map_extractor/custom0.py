@@ -46,18 +46,30 @@ def decode_custom0(data):
     }
     if "pathId" in data["data"]:
         header["path_id"] = data["data"]["pathId"]
-    if "area" in data["data"]:
-        areas = []
-        for area in data["data"]["area"]:
-            room = {"name": area["name"], "id": area["id"], "type": area["active"]}
-            room_vertexs = []
-            for vertex in area["vertexs"]:
-                room_vertexs.append(map_to_image(vertex, header["mapResolution"], header["x_min"], header["y_min"]))
-            room["vertexs"] = room_vertexs
-            areas.append(room)
-        header["area"] = areas
+    
+    header["roominfo"] = decode_roomArr(data["data"]["area"], header)
 
     return header, bytes_map
+
+def decode_roomArr(areas: dict, header: dict):
+    rooms = []
+    for area in areas:
+        room = {
+            "id": area["id"],
+            "type": area["active"],
+            "mode": area["mode"],
+            "tag": area["tag"],
+            "name": area["name"]
+        }
+        if "forbidType" in area:
+            room["forbidType"] = area["forbidType"]
+        room_vertexs = []
+        for vertex in area["vertexs"]:
+            room_vertexs.append(map_to_image(vertex, header["mapResolution"], header["x_min"], header["y_min"]))
+        room["vertexs"] = room_vertexs
+        rooms.append(room)
+
+    return rooms
 
 def decode_path_custom0(data, header):
     resolution = header["mapResolution"]
@@ -76,6 +88,7 @@ def to_array_custom0(
         colors["bg_color"] = default_colors.custom_0.get("bg_color")
         colors["wall_color"] = default_colors.custom_0.get("wall_color")
         colors["inside_color"] = default_colors.custom_0.get("inside_color")
+    colors["room_color"] = colors["inside_color"]
     pixels = []
     height_counter = 0
     while height_counter < height:
