@@ -57,7 +57,7 @@ def decode_roomArr(areas: dict, header: dict):
     rooms = []
     for area in areas:
         room = {
-            "id": area["id"],
+            "ID": area["id"],
             "type": area["active"],
             "mode": area["mode"],
             "tag": area["tag"],
