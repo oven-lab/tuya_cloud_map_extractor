@@ -47,7 +47,9 @@ def decode_custom0(data):
     if "pathId" in data["data"]:
         header["path_id"] = data["data"]["pathId"]
     
-    header["roominfo"] = decode_roomArr(data["data"]["area"], header)
+    roominfo = decode_roomArr(data["data"]["area"], header)
+    if roominfo != []:
+        header["roominfo"] = roominfo 
 
     return header, bytes_map
 

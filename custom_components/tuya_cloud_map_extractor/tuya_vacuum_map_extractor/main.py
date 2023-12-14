@@ -116,7 +116,7 @@ def get_map(
     response = download(map_link)
 
     if response.status_code != 200:
-        _LOGGER.warning("Got " + response.status_code + " from server whhle downloading map.")
+        _LOGGER.warning("Got " + str(response.status_code) + " from server whhle downloading map.")
 
     _LOGGER.debug(
         "Response: "
@@ -161,7 +161,8 @@ def get_map(
         image = image.resize((image.size[0]*scale, image.size[1]*scale), resample=Image.BOX)
         response = download(path_link)
         if response.status_code != 200:
-            _LOGGER.warning("Got " + response.status_code + " from server while downloading path.")
+            _LOGGER.warning("Got " + str(response.status_code) + " from server while downloading path.")
+            raise FileNotFoundError
         path = parse_path(response, scale=scale, header=header)
         draw = ImageDraw.Draw(image, 'RGBA')
         draw.line(path, fill=tuple(colors["path_color"]), width=1)
