@@ -13,6 +13,7 @@ from .v0 import decode_v0, to_array_v0
 from .v1 import decode_v1, to_array_v1, decode_path_v1
 from .custom0 import decode_custom0, to_array_custom0, decode_path_custom0
 from .tuya import get_download_link
+from .const import NotSupportedError
 from .common import decode_header
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def parse_map(response: requests.models.Response):
         elif header["version"] == [1]:
             mapDataArr = decode_v1(data, header)
         else:
-            raise RuntimeError
+            raise NotSupportedError("Map version " + str(header["version"]) +" is not supported.")
         
     return header, mapDataArr
 

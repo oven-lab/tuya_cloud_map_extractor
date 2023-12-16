@@ -149,6 +149,7 @@ class VacuumCamera(Camera):
             _LOGGER.warning("Unable to parse map data")
             _LOGGER.error(error)
             self._status = CameraStatus.FAILURE
+            return
 
         if map_data is not None:
             _LOGGER.debug("Map is ok")
@@ -211,4 +212,4 @@ class CameraStatus(Enum):
     INITIALIZING = "Initializing"
     OK = "OK"
     OFF = "OFF"
-    FAILURE = "Faliure"
+    FAILURE = "Failure"

@@ -272,3 +272,6 @@ class DeviceIDError(Exception):
 
 class PixelValueNotDefined(Exception):
     pass
+
+class NotSupportedError(Exception):
+    pass
