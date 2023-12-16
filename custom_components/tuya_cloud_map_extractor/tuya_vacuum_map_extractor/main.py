@@ -10,8 +10,8 @@ from datetime import datetime
 import logging
 from PIL import Image, ImageDraw
 from .v0 import decode_v0, to_array_v0
-from .v1 import decode_v1, to_array_v1, decode_path_v1
-from .custom0 import decode_custom0, to_array_custom0, decode_path_custom0
+from .v1 import decode_v1, to_array_v1, decode_path_v1, _format_path_point
+from .custom0 import decode_custom0, to_array_custom0, decode_path_custom0, map_to_image
 from .tuya import get_download_link
 from .const import NotSupportedError
 from .common import decode_header
@@ -176,14 +176,25 @@ def get_map(
             raise FileNotFoundError
         path = parse_path(response, scale=scale, header=header)
         draw = ImageDraw.Draw(image, 'RGBA')
-        draw.line(path, fill=tuple(colors["path_color"]), width=1)
+        draw.line(path, fill=tuple(colors["path_color"]), width=2)
+
+        x, y = header["pileX"], header["pileY"]
+        if header["version"] in [[0], [1]]:
+            point = _format_path_point({'x': x, 'y': y}, False)
+        elif header["version"] == "custom0":
+            point = map_to_image([x, y], header["mapResolution"], header["x_min"], header["y_min"])
+
+        x = point[0]*scale
+        y = point[1]*scale
+        
+        draw.ellipse([(x-10, y-10), (x+10, y+10)], outline=(255, 255, 255), fill=(0, 255, 0), width=2)
 
         if last:
             x, y = path[-2], path[-1]
         else:
             x, y = path[0], path[1]
 
-        draw.ellipse([(x-5, y-5), (x+5, y+5)], outline=(255, 255, 255), fill=(0, 0, 255), width=1)
+        draw.ellipse([(x-7, y-7), (x+7, y+7)], outline=(255, 255, 255), fill=(0, 0, 255), width=2)
 
         if "area" in header and header["version"] == "custom0":
             for area in header["area"]:

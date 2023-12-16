@@ -42,6 +42,8 @@ def decode_custom0(data):
         "x_min": data["data"]["x_min"],
         "y_min": data["data"]["y_min"],
         "mapResolution": data["data"]["resolution"],
+        "pileX": data["data"]["chargeHandlePos"][0],
+        "pileY": data["data"]["chargeHandlePos"][1],
         "calibrationPoints": create_calibration_points(data["data"]["resolution"], data["data"]["x_min"], data["data"]["y_min"])
     }
     if "pathId" in data["data"]:
