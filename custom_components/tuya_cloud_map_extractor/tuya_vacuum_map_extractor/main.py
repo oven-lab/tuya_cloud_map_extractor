@@ -185,8 +185,8 @@ def get_map(
 
         draw.ellipse([(x-5, y-5), (x+5, y+5)], outline=(255, 255, 255), fill=(0, 0, 255), width=1)
 
-        if "roominfo" in header and header["version"] == "custom0":
-            for area in header["roominfo"]:
+        if "area" in header and header["version"] == "custom0":
+            for area in header["area"]:
                 coords = []
                 for i in area["vertexs"]:
                     coords.append(i[0]*scale)
