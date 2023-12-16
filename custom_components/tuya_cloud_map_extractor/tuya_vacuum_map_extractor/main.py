@@ -9,10 +9,11 @@ from datetime import datetime
 # import lz4.block
 import logging
 from PIL import Image, ImageDraw
+from .v0 import decode_v0, to_array_v0
 from .v1 import decode_v1, to_array_v1, decode_path_v1
 from .custom0 import decode_custom0, to_array_custom0, decode_path_custom0
 from .tuya import get_download_link
-from .const import PixelValueNotDefined
+from .common import decode_header
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,8 +30,14 @@ def parse_map(response: requests.models.Response):
 
     except JSONDecodeError:
         data = response.content.hex()
-        header, mapDataArr = decode_v1(data)
-
+        header = decode_header(data[0:48])
+        if header["version"] == [0]:
+            mapDataArr = decode_v0(data, header)
+        elif header["version"] == [1]:
+            mapDataArr = decode_v1(data, header)
+        else:
+            raise RuntimeError
+        
     return header, mapDataArr
 
 def parse_path(response: requests.models.Response, scale=2.0, header={}):
@@ -82,8 +89,11 @@ def render_layout(raw_map: bytes, header: dict, colors: dict) -> Image.Image:
 
     if protoVer == "custom0":
         array = to_array_custom0(pixellist, width, height, colors)
+    
+    elif protoVer == "0":
+        array = to_array_v0(pixellist, width, height, colors)
 
-    if protoVer == "1":
+    elif protoVer == "1":
         rooms = header["roominfo"]
         array = to_array_v1(pixellist, width, height, rooms, colors)
 

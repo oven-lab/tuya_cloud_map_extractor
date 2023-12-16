@@ -7,30 +7,21 @@ from .const import (
     types,
     BYTE_HEADER_LENGHT_PATH_V1
 )
+from .common import (
+    _highLowToInt,
+    _hexStringToNumber,
+    _chunk,
+    decode_header
+)
 
 _LOGGER = logging.getLogger(__name__)
 
-
-def _hexStringToNumber(bits):
-    number = []
-    for i in [bits[i : i + 2] for i in range(0, len(bits), 2)]:
-        number.append(int(i, 16))
-    return number
-
-
-def _chunk(In, n):
-    out = []
-    for i in [In[i : i + n] for i in range(0, len(In), n)]:
-        out.append(i)
-    return out
+def _deal_pl(point):
+    return point - 65536 if point > 32768 else point
 
 
 def _partition(string, chunk):
     return [string[i:i + chunk] for i in range(0, len(string), chunk)]
-
-
-def _deal_pl(point):
-    return point - 65536 if point > 32768 else point
 
 
 def scale_number(scale, value):
@@ -39,10 +30,6 @@ def scale_number(scale, value):
 
 def shrink_value(value):
     return scale_number(1, value)
-
-
-def _highLowToInt(high, low):
-    return low + (high << 8)
 
 
 def _numberToBase(n, b):
@@ -61,46 +48,6 @@ def _format_path_point(origin_point, reverse_y = True):
         raise ValueError(f"path point x or y is not number: x = {x}, y = {y}")
     real_point = [shrink_value(x), -shrink_value(y)] if reverse_y else [shrink_value(x), shrink_value(y)]
     return real_point
-
-
-def decode_header_v1(header: str):
-    maxmin = list(
-        map(lambda x: _highLowToInt(x[0], x[1]), _chunk(_hexStringToNumber(header), 2))
-    )
-    return {
-        "id": list(
-            map(
-                lambda x: _highLowToInt(x[0], x[1]),
-                _chunk(_hexStringToNumber(header[2:6]), 2),
-            )
-        ),
-        "version": _hexStringToNumber(header[0:2]),
-        "roomeditable": True,
-        "type": _hexStringToNumber(header[6:8]),
-        "width": maxmin[2],
-        "height": maxmin[3],
-        "originx": maxmin[4],
-        "originy": maxmin[5],
-        "mapResolution": maxmin[6],
-        "pileX": maxmin[7],
-        "pileY": maxmin[8],
-        "totalcount": int(header[36:44], 16),
-        "compressbeforelength": int(header[36:44], 16),
-        "compressafterlenght": maxmin[11],
-        "calibrationPoints": [{
-            'vacuum': {'x': 0, 'y': 0}, 
-            'map': {'x': 0.0, 'y': -0.0}
-        }, 
-        {
-            'vacuum': {'x': 0, 'y': 200}, 
-            'map': {'x': 0.0, 'y': -20.0}
-        }, 
-        {
-            'vacuum': {'x': 200, 'y': 0}, 
-            'map': {'x': 20.0, 'y': -0.0}
-        }]
-    }
-
 
 def decode_roomArr(mapRoomArr):
     rooms = []
@@ -192,8 +139,7 @@ def to_array_v1(
     return np.array(pixels, dtype=np.uint8)
 
 
-def decode_v1(data):
-    header = decode_header_v1(data[0:48])
+def decode_v1(data: str, header: dict):
     _LOGGER.debug(header)
     mapArea = header["width"] * header["height"]
     infoLength = 48 + header["totalcount"] * 2
@@ -207,4 +153,4 @@ def decode_v1(data):
         header["roominfo"] = []
         _LOGGER.debug("No rooms v1")
 
-    return header, mapDataArr
+    return mapDataArr

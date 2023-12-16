@@ -1,5 +1,12 @@
 BYTE_HEADER_LENGHT_PATH_V1 = 26
 
+bitmapTypeHexMap = {
+  '00': '00', # Cleaning point
+  '01': 'f1', # Obstacle point
+  '10': 'f2', # Charging pile
+  '11': 'ff', # Unknown area 
+}
+
 class types:
     """Number to type"""
 
@@ -32,6 +39,13 @@ class types:
         25: "room_color",
         127: "bg_color",  # bg
         255: "inside_color",  # inside
+    }
+
+    v0 = {
+        0: "inside_color",
+        241: "wall_color",
+        242: "charger",
+        255: "bg_color"
     }
     # obstacle2 unreachable?
     v1 = {
@@ -225,6 +239,13 @@ class default_colors:
         "wall_color": [255, 255, 255],
         "bg_color": [44, 50, 64],
         "inside_color": [94, 93, 109],
+    }
+
+    v0 = {
+        "wall_color": [255, 255, 255],
+        "bg_color": [44, 50, 64],
+        "inside_color": [94, 93, 109],
+        "charger": [0, 255, 0]
     }
 
     v1 = {
