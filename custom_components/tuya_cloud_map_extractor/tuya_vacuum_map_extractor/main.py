@@ -174,6 +174,13 @@ def get_map(
         if response.status_code != 200:
             _LOGGER.warning("Got " + str(response.status_code) + " from server while downloading path.")
             raise FileNotFoundError
+        
+        _LOGGER.debug(
+            "Response path: "
+            + str(response.status_code)
+            + str(base64.b64encode(response.content))
+        )
+
         path = parse_path(response, scale=scale, header=header)
         draw = ImageDraw.Draw(image, 'RGBA')
         draw.line(path, fill=tuple(colors["path_color"]), width=2)

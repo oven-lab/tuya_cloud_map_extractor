@@ -1,3 +1,4 @@
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/ovenlab)
 # Tuya cloud vaccum map extractor
 This integration extracts and exposes live maps from tuya laser vaccums into Home Assistant.
 
