@@ -127,7 +127,7 @@ def get_map(
         map_link = link["result"][0]["map_url"]
         response = download(map_link)
     except Exception as e:
-        _LOGGER.error("Encountered an error, please include the following data in your github issue: " + str(base64.b64encode(json.dumps(link).encode()))
+        _LOGGER.error("Encountered an error, please include the following data in your github issue: " + str(base64.b64encode(json.dumps(link).encode())))
         raise e
 
     if response.status_code != 200:
