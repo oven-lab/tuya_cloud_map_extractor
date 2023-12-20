@@ -2,6 +2,7 @@
 import base64
 import requests
 import math
+import json
 
 from requests.exceptions import JSONDecodeError
 from datetime import datetime
@@ -122,12 +123,15 @@ def get_map(
     else:
         link = get_download_link(server, client_id, secret_key, device_id)
 
-    map_link = link["result"][0]["map_url"]
-
-    response = download(map_link)
+    try:
+        map_link = link["result"][0]["map_url"]
+        response = download(map_link)
+    except Exception as e:
+        _LOGGER.error("Encountered an error, please include the following data in your github issue: " + str(base64.b64encode(json.dumps(link).encode()))
+        raise e
 
     if response.status_code != 200:
-        _LOGGER.warning("Got " + str(response.status_code) + " from server whhle downloading map.")
+        _LOGGER.warning("Got " + str(response.status_code) + " from server while downloading map.")
 
     _LOGGER.debug(
         "Response: "
