@@ -49,6 +49,9 @@ class types:
     }
     # obstacle2 unreachable?
     v1 = {
+        0: "room_color_0",
+        1: "wall_color",
+        3: "wall_color",
         4: "room_color_1",
         5: "wall_color",
         7: "wall_color",
@@ -229,6 +232,12 @@ class types:
         240: "wall_color",  # general obstacle?
         241: "wall_color",  # wall
         243: "bg_color",  # bg
+        248: "wall_color",
+        249: "wall_color",
+        251: "wall_color",
+        252: "wall_color",
+        253: "wall_color",
+        255: "bg_color"
     }
 
 

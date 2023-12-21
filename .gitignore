@@ -166,3 +166,4 @@ debug_server/
 test.py
 *.bin
 extract_route.py
+*.bak

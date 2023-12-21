@@ -185,7 +185,12 @@ def get_map(
             + str(base64.b64encode(response.content))
         )
 
-        path = parse_path(response, scale=scale, header=header)
+        try:
+            path = parse_path(response, scale=scale, header=header)
+        except Exception as e:
+            _LOGGER.error("Failed to parse path: " + str(base64.b64encode(response.content)))
+            raise e
+        
         draw = ImageDraw.Draw(image, 'RGBA')
         draw.line(path, fill=tuple(colors["path_color"]), width=2)
 
