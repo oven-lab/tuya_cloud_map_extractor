@@ -246,11 +246,8 @@ def create_entry_data(data: dict, header: dict):
                 CONF_ROOM_COLOR + str(i["ID"])
             )
 
-    else:
-        if CONF_INSIDE_COLOR not in data:
-            data[CONF_INSIDE_COLOR] = DEFAULT_ROOM_COLOR
-        colors[CONF_INSIDE_COLOR] = data.pop(CONF_INSIDE_COLOR)
-
+    if not CONF_INSIDE_COLOR in data:
+        data[CONF_INSIDE_COLOR] = DEFAULT_ROOM_COLOR
     if not CONF_BG_COLOR in data:
         data[CONF_BG_COLOR] = DEFAULT_BG_COLOR
     if not CONF_WALL_COLOR in data:
@@ -266,6 +263,7 @@ def create_entry_data(data: dict, header: dict):
     colors[CONF_BG_COLOR] = data.pop(CONF_BG_COLOR)
     colors[CONF_WALL_COLOR] = data.pop(CONF_WALL_COLOR)
     colors[CONF_PATH_COLOR] = data.pop(CONF_PATH_COLOR)
+    colors[CONF_INSIDE_COLOR] = data.pop(CONF_INSIDE_COLOR)
 
     data["colors"] = colors
     return data

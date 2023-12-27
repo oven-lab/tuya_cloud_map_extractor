@@ -49,15 +49,20 @@ def decode_custom0(data):
     if "pathId" in data["data"]:
         header["path_id"] = data["data"]["pathId"]
     
-    area = decode_roomArr(data["data"]["area"], header)
+    area, room = decode_roomArr(data["data"]["area"], header)
     if area != []:
         header["area"] = area
+    if room != []:
+        header["roominfo"] = room
 
     return header, bytes_map
 
 def decode_roomArr(areas: dict, header: dict):
     rooms = []
+    roominfo = []
+    ids = []
     for area in areas:
+        ids.append(area["id"])
         room = {
             "ID": area["id"],
             "type": area["active"],
@@ -72,8 +77,16 @@ def decode_roomArr(areas: dict, header: dict):
             room_vertexs.append(map_to_image(vertex, header["mapResolution"], header["x_min"], header["y_min"]))
         room["vertexs"] = room_vertexs
         rooms.append(room)
+    for i in range(min(ids)):
+        roominfo.append({
+            "ID": i,
+            "type": "room",
+            "mode": "normal",
+            "tag": i,
+            "name": "room" + str(i)
+        })
 
-    return rooms
+    return rooms, roominfo
 
 def decode_path_custom0(data, header):
     resolution = header["mapResolution"]
