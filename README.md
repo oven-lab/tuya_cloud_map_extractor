@@ -9,8 +9,7 @@ This is my first Home Assistant integration, so if things go terribly wrong, ple
 
 
 ### Using HACS
-This integration is not yet in HACS default repository, but can be manually installed via HACS.
-Add this repository as a custom repository in HACS, and install as normal.
+This integration is included in the HACS default repository. Just search for Tuya cloud map extractor and install!
 
 
 ### Manually 
