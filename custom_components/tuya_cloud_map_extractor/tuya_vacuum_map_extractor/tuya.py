@@ -2,7 +2,7 @@ import datetime
 import hmac
 import requests
 
-from .const import ServerError, ClientIDError, ClientSecretError, DeviceIDError
+from .const import ServerError, ClientIDError, ClientSecretError, DeviceIDError, NotSupportedError
 
 def _get_sign(client_id: str, secret_key: str, url: str, t: int, token: str):
     empty_hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -66,5 +66,8 @@ def get_download_link(
             raise DeviceIDError("Invalid Device ID")
         else:
             raise RuntimeError("Request failed - Response: ", response)
+
+    if not response["result"]:
+        raise NotSupportedError("Vacuum not supported: API returned no realtime maps")
 
     return response
