@@ -36,7 +36,7 @@ def decode_header(header: str):
         "pileY": maxmin[8],
         "totalcount": int(header[36:44], 16),
         "compressbeforelength": int(header[36:44], 16),
-        "compressafterlenght": maxmin[11],
+        "compressafterlength": maxmin[11],
         "calibrationPoints": [{
             'vacuum': {'x': 0, 'y': 0}, 
             'map': {'x': 0.0, 'y': -0.0}
