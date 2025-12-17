@@ -1,4 +1,24 @@
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/ovenlab)
+# ⚠️🔴 **This integration has stopped receiving updates** 🔴⚠️
+
+**Important notice:** This custom integration is no longer maintained and will not receive any further updates, bug fixes, or new features.
+The Tuya vacuum protocol is not standardized across manufacturers. While Tuya provides a common cloud platform, each robot vacuum brand (or even different models from the same brand) implements its own proprietary variations of the protocol, including custom message formats, encryption methods, map data structures, and command sets.
+
+This integration was developed primarily through reverse engineering and currently works with the devices listed further down in the readme.
+
+However, compatibility with other Tuya-based vacuums is limited and often inconsistent. Adding support for new models typically requires extensive reverse engineering, decoding binary map data, and handling manufacturer-specific quirks—for each individual device or firmware version.
+
+Given the tremendous amount of work required to support additional devices, and the lack of official documentation or a unified protocol from Tuya, I have decided to discontinue active development and maintenance of this project.
+
+### What this means for users
+- The integration will continue to function as-is for supported devices, as long as the Tuya cloud API remains compatible.
+- No guarantees are made about long-term functionality, especially if Tuya changes their cloud services or manufacturers update firmware.
+- If your device currently works, you may wish to avoid updating the vacuum's firmware when possible.
+- For future needs, consider exploring alternatives such as:
+  - Regular controls through localtuya and tuya integrations.
+  - Manufacturer-specific integrations if available
+
+Thanks to everyone that has been participant in the development of this project, even if it didn't work out like i planned.
+
 # Tuya cloud vaccum map extractor
 This integration extracts and exposes live maps from tuya laser vaccums into Home Assistant.
 
