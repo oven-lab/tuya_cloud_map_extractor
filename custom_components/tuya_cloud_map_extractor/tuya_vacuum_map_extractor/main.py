@@ -48,7 +48,7 @@ def parse_path(response: requests.models.Response, scale=2.0, header={}):
         path_data = decode_path_custom0(data, header)
     except JSONDecodeError:
         data = response.content.hex()
-        path_data = decode_path_v1(data)
+        path_data = decode_path_v1(data, header)
     
     coords = []
     for coord in path_data:

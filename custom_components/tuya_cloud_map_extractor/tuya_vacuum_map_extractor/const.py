@@ -1,4 +1,5 @@
 BYTE_HEADER_LENGHT_PATH_V1 = 26
+is_Lz4 = True
 
 bitmapTypeHexMap = {
   '00': '00', # Cleaning point

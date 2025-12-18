@@ -5,7 +5,8 @@ from .pylz4 import uncompress
 from .const import (
     default_colors, 
     types,
-    BYTE_HEADER_LENGHT_PATH_V1
+    BYTE_HEADER_LENGHT_PATH_V1,
+    is_Lz4
 )
 from .common import (
     _highLowToInt,
@@ -101,15 +102,28 @@ def decode_roomArr(mapRoomArr):
 
     return rooms
 
-def decode_path_v1(pathdata):
+def decode_path_v1(pathdata, header):
     header_length = BYTE_HEADER_LENGHT_PATH_V1 // 2
     data_arr = _hexStringToNumber(pathdata)
-    path_data_arr = [data_arr[i:i + 4] for i in range(header_length, len(data_arr), 4)]
+
+    originX = 0
+    originY = 0
+
+    if(is_Lz4 and header["compressafterlength"] != 0):
+        encode_data_array = _hexStringToNumber(pathdata[BYTE_HEADER_LENGHT_PATH_V1:])
+        decode_data_array = uncompress(bytes(encode_data_array))
+
+        originX = header["originx"]
+        originY = header["originy"]
+
+        path_data_arr = [decode_data_array[i:i + 4] for i in range(0, len(decode_data_array), 4)]
+    else:
+        path_data_arr = [data_arr[i:i + 4] for i in range(header_length, len(data_arr), 4)]
 
     path_data = []
     for point in path_data_arr:
         x, y = [_deal_pl(_highLowToInt(high, low)) for high, low in _partition(point, 2)]
-        real_point = _format_path_point({'x': x, 'y': y})
+        real_point = _format_path_point({'x': x + originX, 'y': y - originY})
         path_data.append(real_point)
 
     return path_data
